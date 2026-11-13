@@ -28,9 +28,9 @@ export function App() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen max-w-2xl mx-auto">
+    <div className="flex flex-col h-dvh max-w-2xl mx-auto">
       {/* Content */}
-      <main className="flex-1 overflow-y-auto pb-safe">
+      <main className="flex-1 overflow-y-auto safe-top">
         {tab === 'dashboard' && (
           <DashboardPage
             {...appData}
