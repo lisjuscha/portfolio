@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Portfolio</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/portfolio/manifest.webmanifest" />
+    <meta name="theme-color" content="#1d4ed8" />
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Portfolio" />
+    <link rel="apple-touch-icon" href="/portfolio/apple-touch-icon.png" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/portfolio/favicon.svg" />
+
+    <!-- Service Worker registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/portfolio/sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+              const worker = reg.installing
+              if (!worker) return
+              worker.addEventListener('statechange', () => {
+                if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New SW installed while old one is active — reload all tabs
+                  worker.postMessage({ type: 'SKIP_WAITING' })
+                  window.location.reload()
+                }
+              })
+            })
+          })
+        })
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
