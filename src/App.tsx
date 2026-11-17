@@ -35,7 +35,7 @@ export function App() {
       {/* Non-scrolling safe-area spacer — sits outside scroll, covers Dynamic Island */}
       <div className="shrink-0" style={{ height: 'env(safe-area-inset-top)' }} />
       {/* Content */}
-      <main className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+      <main className="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-safe">
         {tab === 'dashboard' && (
           <DashboardPage
             {...appData}
