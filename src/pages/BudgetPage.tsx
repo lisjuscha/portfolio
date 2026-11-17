@@ -1,17 +1,17 @@
 import { useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react'
-import type { Ausgabe, AusgabenKategorie } from '../types'
+import type { Ausgabe, AusgabenKategorie, Vertrag } from '../types'
 import { DonutChart } from '../components/DonutChart'
 import { AUSGABEN_KATEGORIEN, AUSGABEN_FARBEN } from '../forms/AusgabeForm'
+import { naechsteAbbuchungAb } from '../utils/calc'
+import { formatEuro } from '../utils/format'
 
 const MONATE = [
   'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
   'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
 ]
 
-function formatEuro(n: number) {
-  return n.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
-}
+const VERTRAG_FARBE = '#5856d6'
 
 function formatDatumLang(iso: string) {
   const [y, m, d] = iso.split('-').map(Number)
@@ -19,13 +19,24 @@ function formatDatumLang(iso: string) {
   return date.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'long' })
 }
 
+function vertraegeImMonat(vertraege: Vertrag[], monat: number, jahr: number): Vertrag[] {
+  const firstDay = new Date(jahr, monat, 1)
+  const lastDay = new Date(jahr, monat + 1, 0)
+  return vertraege.filter(v => {
+    if (v.status !== 'aktiv') return false
+    const abbuchung = naechsteAbbuchungAb(v, firstDay)
+    return abbuchung <= lastDay
+  })
+}
+
 interface Props {
   ausgaben: Ausgabe[]
+  vertraege: Vertrag[]
   onAdd: () => void
   onRemove: (id: string) => void
 }
 
-export function BudgetPage({ ausgaben, onAdd, onRemove }: Props) {
+export function BudgetPage({ ausgaben, vertraege, onAdd, onRemove }: Props) {
   const now = new Date()
   const [monat, setMonat] = useState(now.getMonth())
   const [jahr, setJahr] = useState(now.getFullYear())
@@ -46,9 +57,19 @@ export function BudgetPage({ ausgaben, onAdd, onRemove }: Props) {
     [ausgaben, monatPrefix]
   )
 
-  const gesamt = useMemo(
+  const monatVertraege = useMemo(
+    () => vertraegeImMonat(vertraege, monat, jahr),
+    [vertraege, monat, jahr]
+  )
+
+  const ausgabenGesamt = useMemo(
     () => monatAusgaben.reduce((s, a) => s + a.betrag, 0),
     [monatAusgaben]
+  )
+
+  const fixkostenGesamt = useMemo(
+    () => monatVertraege.reduce((s, v) => s + v.betrag, 0),
+    [monatVertraege]
   )
 
   const donutSegments = useMemo(() => {
@@ -56,20 +77,21 @@ export function BudgetPage({ ausgaben, onAdd, onRemove }: Props) {
     for (const a of monatAusgaben) {
       byKat.set(a.kategorie, (byKat.get(a.kategorie) ?? 0) + a.betrag)
     }
-    return AUSGABEN_KATEGORIEN
+    const segments = AUSGABEN_KATEGORIEN
       .filter(k => (byKat.get(k) ?? 0) > 0)
       .map(k => ({ label: k, value: byKat.get(k)!, color: AUSGABEN_FARBEN[k] }))
-      .sort((a, b) => b.value - a.value)
-  }, [monatAusgaben])
+    if (fixkostenGesamt > 0) {
+      segments.push({ label: 'Fixkosten', value: fixkostenGesamt, color: VERTRAG_FARBE })
+    }
+    return segments.sort((a, b) => b.value - a.value)
+  }, [monatAusgaben, fixkostenGesamt])
 
-  // Group by day, newest first
   const grouped = useMemo(() => {
     const map = new Map<string, Ausgabe[]>()
     const sorted = [...monatAusgaben].sort((a, b) => b.datum.localeCompare(a.datum))
     for (const a of sorted) {
-      const day = a.datum
-      if (!map.has(day)) map.set(day, [])
-      map.get(day)!.push(a)
+      if (!map.has(a.datum)) map.set(a.datum, [])
+      map.get(a.datum)!.push(a)
     }
     return [...map.entries()]
   }, [monatAusgaben])
@@ -101,13 +123,30 @@ export function BudgetPage({ ausgaben, onAdd, onRemove }: Props) {
       </div>
 
       <div className="px-4 pt-4 space-y-4">
-        {/* Monthly total */}
-        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 flex items-center justify-between">
-          <div>
-            <div className="text-xs text-gray-500 dark:text-[#8e8e93] font-medium uppercase tracking-wide">Ausgaben {MONATE[monat]}</div>
-            <div className="text-2xl font-bold mt-0.5">{formatEuro(gesamt)}</div>
+        {/* Monthly totals */}
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
+              <div className="text-xs text-gray-500 dark:text-[#8e8e93] font-medium">Variable Ausgaben</div>
+              <div className="text-xl font-bold mt-0.5">{formatEuro(ausgabenGesamt)}</div>
+            </div>
+            <div className="text-xs text-gray-400">{monatAusgaben.length} Einträge</div>
           </div>
-          <div className="text-sm text-gray-400">{monatAusgaben.length} Einträge</div>
+          {fixkostenGesamt > 0 && (
+            <>
+              <div className="flex items-center justify-between px-4 py-3">
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-[#8e8e93] font-medium">Fixkosten (Verträge)</div>
+                  <div className="text-xl font-bold mt-0.5">{formatEuro(fixkostenGesamt)}</div>
+                </div>
+                <div className="text-xs text-gray-400">{monatVertraege.length} Verträge</div>
+              </div>
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">Gesamt</div>
+                <div className="text-base font-bold">{formatEuro(ausgabenGesamt + fixkostenGesamt)}</div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Donut chart */}
@@ -129,8 +168,34 @@ export function BudgetPage({ ausgaben, onAdd, onRemove }: Props) {
           </div>
         )}
 
+        {/* Fixkosten aus Verträgen */}
+        {monatVertraege.length > 0 && (
+          <div>
+            <div className="text-xs font-semibold text-gray-500 dark:text-[#8e8e93] uppercase tracking-wide mb-2 px-1">
+              Fixkosten diesen Monat
+            </div>
+            <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+              {monatVertraege.map(v => (
+                <div key={v.id} className="flex items-center px-4 py-3 gap-3">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: VERTRAG_FARBE + '22' }}
+                  >
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: VERTRAG_FARBE }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{v.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-[#8e8e93] truncate">{v.anbieter} · {v.kategorie}</div>
+                  </div>
+                  <div className="text-sm font-semibold tabular-nums shrink-0">{formatEuro(v.betrag)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Empty state */}
-        {monatAusgaben.length === 0 && (
+        {monatAusgaben.length === 0 && monatVertraege.length === 0 && (
           <div className="text-center py-12 text-gray-400 dark:text-[#8e8e93]">
             <div className="text-4xl mb-3">💸</div>
             <div className="text-sm">Noch keine Ausgaben für {MONATE[monat]}</div>
@@ -141,40 +206,47 @@ export function BudgetPage({ ausgaben, onAdd, onRemove }: Props) {
         )}
 
         {/* Expense list grouped by day */}
-        {grouped.map(([day, eintraege]) => (
-          <div key={day}>
+        {grouped.length > 0 && (
+          <div>
             <div className="text-xs font-semibold text-gray-500 dark:text-[#8e8e93] uppercase tracking-wide mb-2 px-1">
-              {formatDatumLang(day)}
+              Variable Ausgaben
             </div>
-            <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
-              {eintraege.map(a => (
-                <div key={a.id} className="flex items-center px-4 py-3 gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: AUSGABEN_FARBEN[a.kategorie] + '22' }}
-                  >
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: AUSGABEN_FARBEN[a.kategorie] }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">
-                      {a.beschreibung || a.kategorie}
-                    </div>
-                    {a.beschreibung && (
-                      <div className="text-xs text-gray-500 dark:text-[#8e8e93] truncate">{a.kategorie}</div>
-                    )}
-                  </div>
-                  <div className="text-sm font-semibold tabular-nums shrink-0">{formatEuro(a.betrag)}</div>
-                  <button
-                    onClick={() => onRemove(a.id)}
-                    className="p-1 text-gray-300 dark:text-[#48484a] active:text-red-500 shrink-0"
-                  >
-                    <Trash2 size={15} />
-                  </button>
+            {grouped.map(([day, eintraege]) => (
+              <div key={day} className="mb-4">
+                <div className="text-xs text-gray-400 dark:text-[#8e8e93] mb-1.5 px-1">
+                  {formatDatumLang(day)}
                 </div>
-              ))}
-            </div>
+                <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+                  {eintraege.map(a => (
+                    <div key={a.id} className="flex items-center px-4 py-3 gap-3">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: AUSGABEN_FARBEN[a.kategorie] + '22' }}
+                      >
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: AUSGABEN_FARBEN[a.kategorie] }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">
+                          {a.beschreibung || a.kategorie}
+                        </div>
+                        {a.beschreibung && (
+                          <div className="text-xs text-gray-500 dark:text-[#8e8e93] truncate">{a.kategorie}</div>
+                        )}
+                      </div>
+                      <div className="text-sm font-semibold tabular-nums shrink-0">{formatEuro(a.betrag)}</div>
+                      <button
+                        onClick={() => onRemove(a.id)}
+                        className="p-1 text-gray-300 dark:text-[#48484a] active:text-red-500 shrink-0"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   )

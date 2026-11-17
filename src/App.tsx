@@ -31,11 +31,11 @@ export function App() {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-2xl mx-auto">
+    <div className="flex flex-col h-full overflow-hidden max-w-2xl mx-auto">
       {/* Non-scrolling safe-area spacer — sits outside scroll, covers Dynamic Island */}
       <div className="shrink-0" style={{ height: 'env(safe-area-inset-top)' }} />
       {/* Content */}
-      <main className="flex-1 overflow-y-auto overscroll-contain">
+      <main className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
         {tab === 'dashboard' && (
           <DashboardPage
             {...appData}
@@ -58,6 +58,7 @@ export function App() {
         {tab === 'budget' && (
           <BudgetPage
             ausgaben={appData.ausgaben}
+            vertraege={appData.vertraege}
             onAdd={() => setAusgabeFormOpen(true)}
             onRemove={id => void appData.removeAusgabe(id)}
           />
