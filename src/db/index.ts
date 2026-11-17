@@ -1,6 +1,6 @@
 import { openDB } from 'idb'
 import type { DBSchema, IDBPDatabase } from 'idb'
-import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf } from '../types'
+import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf, Ausgabe } from '../types'
 import { encryptBackup, decryptBackup } from '../utils/crypto'
 
 interface PortfolioDB extends DBSchema {
@@ -11,24 +11,31 @@ interface PortfolioDB extends DBSchema {
   vertraege: { key: string; value: Vertrag }
   snapshots: { key: string; value: WertSnapshot; indexes: { 'by-datum': string } }
   kaeufe: { key: string; value: Kauf; indexes: { 'by-position': string } }
+  ausgaben: { key: string; value: Ausgabe; indexes: { 'by-datum': string } }
 }
 
 let dbInstance: IDBPDatabase<PortfolioDB> | null = null
 
 export async function getDB(): Promise<IDBPDatabase<PortfolioDB>> {
   if (dbInstance) return dbInstance
-  dbInstance = await openDB<PortfolioDB>('portfolio', 1, {
-    upgrade(db) {
-      db.createObjectStore('konten', { keyPath: 'id' })
-      db.createObjectStore('positionen', { keyPath: 'id' })
-      const sparplaeneStore = db.createObjectStore('sparplaene', { keyPath: 'id' })
-      sparplaeneStore.createIndex('by-position', 'positionId')
-      db.createObjectStore('sparziele', { keyPath: 'id' })
-      db.createObjectStore('vertraege', { keyPath: 'id' })
-      const snapshotStore = db.createObjectStore('snapshots', { keyPath: 'id' })
-      snapshotStore.createIndex('by-datum', 'datum')
-      const kaufStore = db.createObjectStore('kaeufe', { keyPath: 'id' })
-      kaufStore.createIndex('by-position', 'positionId')
+  dbInstance = await openDB<PortfolioDB>('portfolio', 2, {
+    upgrade(db, oldVersion) {
+      if (oldVersion < 1) {
+        db.createObjectStore('konten', { keyPath: 'id' })
+        db.createObjectStore('positionen', { keyPath: 'id' })
+        const sparplaeneStore = db.createObjectStore('sparplaene', { keyPath: 'id' })
+        sparplaeneStore.createIndex('by-position', 'positionId')
+        db.createObjectStore('sparziele', { keyPath: 'id' })
+        db.createObjectStore('vertraege', { keyPath: 'id' })
+        const snapshotStore = db.createObjectStore('snapshots', { keyPath: 'id' })
+        snapshotStore.createIndex('by-datum', 'datum')
+        const kaufStore = db.createObjectStore('kaeufe', { keyPath: 'id' })
+        kaufStore.createIndex('by-position', 'positionId')
+      }
+      if (oldVersion < 2) {
+        const ausgabenStore = db.createObjectStore('ausgaben', { keyPath: 'id' })
+        ausgabenStore.createIndex('by-datum', 'datum')
+      }
     },
   })
   return dbInstance
@@ -130,6 +137,18 @@ export async function deleteKauf(id: string): Promise<void> {
   await (await getDB()).delete('kaeufe', id)
 }
 
+// ─── Ausgaben ─────────────────────────────────────────────────────────────────
+
+export async function getAllAusgaben(): Promise<Ausgabe[]> {
+  return (await getDB()).getAll('ausgaben')
+}
+export async function putAusgabe(a: Ausgabe): Promise<void> {
+  await (await getDB()).put('ausgaben', a)
+}
+export async function deleteAusgabe(id: string): Promise<void> {
+  await (await getDB()).delete('ausgaben', id)
+}
+
 // ─── Backup ───────────────────────────────────────────────────────────────────
 
 export interface BackupPayload {
@@ -143,11 +162,12 @@ export interface BackupPayload {
   vertraege: Vertrag[]
   snapshots: WertSnapshot[]
   kaeufe: Kauf[]
+  ausgaben: Ausgabe[]
 }
 
 export async function exportAllData(): Promise<BackupPayload> {
   const db = await getDB()
-  const [konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe] = await Promise.all([
+  const [konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe, ausgaben] = await Promise.all([
     db.getAll('konten'),
     db.getAll('positionen'),
     db.getAll('sparplaene'),
@@ -155,18 +175,19 @@ export async function exportAllData(): Promise<BackupPayload> {
     db.getAll('vertraege'),
     db.getAll('snapshots'),
     db.getAll('kaeufe'),
+    db.getAll('ausgaben'),
   ])
   return {
     version: 2,
     exportedAt: new Date().toISOString(),
     apiKey: localStorage.getItem('portfolioApiKey'),
-    konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe,
+    konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe, ausgaben,
   }
 }
 
 export async function importAllData(payload: BackupPayload): Promise<void> {
   const db = await getDB()
-  const stores = ['konten', 'positionen', 'sparplaene', 'sparziele', 'vertraege', 'snapshots', 'kaeufe'] as const
+  const stores = ['konten', 'positionen', 'sparplaene', 'sparziele', 'vertraege', 'snapshots', 'kaeufe', 'ausgaben'] as const
   const clearTx = db.transaction(stores, 'readwrite')
   await Promise.all(stores.map(s => clearTx.objectStore(s).clear()))
   await clearTx.done
@@ -180,6 +201,7 @@ export async function importAllData(payload: BackupPayload): Promise<void> {
     ...(payload.vertraege ?? []).map(r => writeTx.objectStore('vertraege').put(r)),
     ...(payload.snapshots ?? []).map(r => writeTx.objectStore('snapshots').put(r)),
     ...(payload.kaeufe ?? []).map(r => writeTx.objectStore('kaeufe').put(r)),
+    ...(payload.ausgaben ?? []).map(r => writeTx.objectStore('ausgaben').put(r)),
   ])
   await writeTx.done
 

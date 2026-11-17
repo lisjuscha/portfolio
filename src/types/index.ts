@@ -117,3 +117,21 @@ export interface Kauf {
   betrag?: number
   kurs: number
 }
+
+export type AusgabenKategorie =
+  | 'Lebensmittel'
+  | 'Shopping'
+  | 'Restaurant & Café'
+  | 'Transport'
+  | 'Freizeit'
+  | 'Gesundheit'
+  | 'Haushalt'
+  | 'Sonstiges'
+
+export interface Ausgabe {
+  id: string
+  datum: string
+  betrag: number
+  kategorie: AusgabenKategorie
+  beschreibung?: string
+}

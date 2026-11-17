@@ -5,17 +5,20 @@ import { DashboardPage } from './pages/DashboardPage'
 import { AnlagenPage } from './pages/AnlagenPage'
 import { VertraegePage } from './pages/VertraegePage'
 import { TerminePage } from './pages/TerminePage'
+import { BudgetPage } from './pages/BudgetPage'
 import { EinstellungenPage } from './pages/EinstellungenPage'
 import { useAppData } from './hooks/useAppData'
 import { Sheet } from './components/Sheet'
 import { PositionForm } from './forms/PositionForm'
 import { VertragForm } from './forms/VertragForm'
+import { AusgabeForm } from './forms/AusgabeForm'
 
 export function App() {
   const [tab, setTab] = useState<Tab>('dashboard')
   const [hidden, setHidden] = useState(false)
   const [positionFormOpen, setPositionFormOpen] = useState(false)
   const [vertragFormOpen, setVertragFormOpen] = useState(false)
+  const [ausgabeFormOpen, setAusgabeFormOpen] = useState(false)
 
   const appData = useAppData()
 
@@ -52,6 +55,13 @@ export function App() {
         {tab === 'termine' && (
           <TerminePage {...appData} />
         )}
+        {tab === 'budget' && (
+          <BudgetPage
+            ausgaben={appData.ausgaben}
+            onAdd={() => setAusgabeFormOpen(true)}
+            onRemove={id => void appData.removeAusgabe(id)}
+          />
+        )}
         {tab === 'einstellungen' && (
           <EinstellungenPage
             {...appData}
@@ -79,6 +89,14 @@ export function App() {
         <VertragForm
           onSave={v => { void appData.saveVertrag(v); setVertragFormOpen(false) }}
           onCancel={() => setVertragFormOpen(false)}
+        />
+      </Sheet>
+
+      <Sheet open={ausgabeFormOpen} onClose={() => setAusgabeFormOpen(false)}
+        title="Ausgabe erfassen">
+        <AusgabeForm
+          onSave={a => { void appData.saveAusgabe(a); setAusgabeFormOpen(false) }}
+          onCancel={() => setAusgabeFormOpen(false)}
         />
       </Sheet>
     </div>

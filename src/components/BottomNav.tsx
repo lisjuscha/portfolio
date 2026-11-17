@@ -1,13 +1,14 @@
-import { LayoutDashboard, TrendingUp, FileText, Calendar, Settings } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, FileText, Calendar, Settings, Wallet } from 'lucide-react'
 
-export type Tab = 'dashboard' | 'anlagen' | 'vertraege' | 'termine' | 'einstellungen'
+export type Tab = 'dashboard' | 'anlagen' | 'vertraege' | 'termine' | 'budget' | 'einstellungen'
 
 const TABS: { id: Tab; icon: typeof LayoutDashboard; label: string }[] = [
   { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { id: 'anlagen', icon: TrendingUp, label: 'Anlagen' },
   { id: 'vertraege', icon: FileText, label: 'Verträge' },
   { id: 'termine', icon: Calendar, label: 'Termine' },
-  { id: 'einstellungen', icon: Settings, label: 'Einstellungen' },
+  { id: 'budget', icon: Wallet, label: 'Budget' },
+  { id: 'einstellungen', icon: Settings, label: 'Mehr' },
 ]
 
 interface Props {
@@ -26,13 +27,13 @@ export function BottomNav({ active, onChange }: Props) {
             <button
               key={tab.id}
               onClick={() => onChange(tab.id)}
-              className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-[10px] font-medium transition-colors ${
+              className={`flex-1 flex flex-col items-center justify-center py-1.5 gap-0.5 text-[9px] font-medium transition-colors ${
                 isActive
                   ? 'text-blue-600 dark:text-blue-400'
                   : 'text-gray-400 dark:text-[#8e8e93]'
               }`}
             >
-              <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
+              <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
               {tab.label}
             </button>
           )

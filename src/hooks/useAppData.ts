@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf, AktieETFPosition } from '../types'
+import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf, AktieETFPosition, Ausgabe } from '../types'
 import {
   getAllKonten, putKonto, deleteKonto,
   getAllPositionen, putPosition, deletePosition,
@@ -8,6 +8,7 @@ import {
   getAllVertraege, putVertrag, deleteVertrag,
   getAllSnapshots, putSnapshot, getSnapshotForDate,
   getAllKaeufe, putKauf, deleteKauf,
+  getAllAusgaben, putAusgabe, deleteAusgabe,
 } from '../db'
 import { gesamtwertNachAnlageklasse, positionCurrentValue } from '../utils/calc'
 import { toISODate, today } from '../utils/format'
@@ -22,6 +23,7 @@ export interface AppData {
   vertraege: Vertrag[]
   snapshots: WertSnapshot[]
   kaeufe: Kauf[]
+  ausgaben: Ausgabe[]
   fxRates: Record<string, number>
 
   saveKonto(k: Konto): Promise<void>
@@ -36,6 +38,8 @@ export interface AppData {
   removeVertrag(id: string): Promise<void>
   saveKauf(k: Kauf): Promise<void>
   removeKauf(id: string): Promise<void>
+  saveAusgabe(a: Ausgabe): Promise<void>
+  removeAusgabe(id: string): Promise<void>
   refreshQuotes(): Promise<void>
 }
 
@@ -48,13 +52,14 @@ export function useAppData(): AppData {
   const [vertraege, setVertraege] = useState<Vertrag[]>([])
   const [snapshots, setSnapshots] = useState<WertSnapshot[]>([])
   const [kaeufe, setKaeufe] = useState<Kauf[]>([])
+  const [ausgaben, setAusgaben] = useState<Ausgabe[]>([])
   const [fxRates, setFxRates] = useState<Record<string, number>>({})
   const loadedRef = useRef(false)
 
   const load = useCallback(async () => {
-    const [k, p, sp, sz, v, sn, ka] = await Promise.all([
+    const [k, p, sp, sz, v, sn, ka, au] = await Promise.all([
       getAllKonten(), getAllPositionen(), getAllSparplaene(),
-      getAllSparziele(), getAllVertraege(), getAllSnapshots(), getAllKaeufe(),
+      getAllSparziele(), getAllVertraege(), getAllSnapshots(), getAllKaeufe(), getAllAusgaben(),
     ])
     setKonten(k)
     setPositionen(p)
@@ -63,6 +68,7 @@ export function useAppData(): AppData {
     setVertraege(v)
     setSnapshots(sn.sort((a, b) => a.datum.localeCompare(b.datum)))
     setKaeufe(ka)
+    setAusgaben(au)
     setReady(true)
     return p
   }, [])
@@ -202,10 +208,20 @@ export function useAppData(): AppData {
     setKaeufe(prev => prev.filter(x => x.id !== id))
   }, [])
 
+  const saveAusgabe = useCallback(async (a: Ausgabe) => {
+    await putAusgabe(a)
+    setAusgaben(prev => { const next = prev.filter(x => x.id !== a.id); return [...next, a] })
+  }, [])
+  const removeAusgabe = useCallback(async (id: string) => {
+    await deleteAusgabe(id)
+    setAusgaben(prev => prev.filter(x => x.id !== id))
+  }, [])
+
   return {
-    ready, konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe, fxRates,
+    ready, konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe, ausgaben, fxRates,
     saveKonto, removeKonto, savePosition, removePosition,
     saveSparplan, removeSparplan, saveSparziel, removeSparziel,
-    saveVertrag, removeVertrag, saveKauf, removeKauf, refreshQuotes,
+    saveVertrag, removeVertrag, saveKauf, removeKauf,
+    saveAusgabe, removeAusgabe, refreshQuotes,
   }
 }
