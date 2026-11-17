@@ -1,4 +1,4 @@
-const CACHE = 'portfolio-v1'
+const CACHE = 'portfolio-v2'
 
 self.addEventListener('install', () => {
   self.skipWaiting()
