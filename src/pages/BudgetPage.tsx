@@ -77,7 +77,7 @@ export function BudgetPage({ ausgaben, vertraege, onAdd, onRemove }: Props) {
     for (const a of monatAusgaben) {
       byKat.set(a.kategorie, (byKat.get(a.kategorie) ?? 0) + a.betrag)
     }
-    const segments = AUSGABEN_KATEGORIEN
+    const segments: { label: string; value: number; color: string }[] = AUSGABEN_KATEGORIEN
       .filter(k => (byKat.get(k) ?? 0) > 0)
       .map(k => ({ label: k, value: byKat.get(k)!, color: AUSGABEN_FARBEN[k] }))
     if (fixkostenGesamt > 0) {
