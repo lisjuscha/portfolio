@@ -170,24 +170,29 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
   }
 
   return (
-    <div className="px-4 py-4 pb-8 space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Verträge</h1>
-        <button onClick={() => { setEditVertrag(null); setFormOpen(true) }}
-          className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
-          <Plus size={16} /> Vertrag
-        </button>
-      </div>
-
-      {/* Sort */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {(['abbuchung', 'kuendigung', 'kategorie'] as SortBy[]).map(s => (
-          <button key={s} onClick={() => setSortBy(s)}
-            className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${sortBy === s ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
-            {s === 'abbuchung' ? 'Abbuchung' : s === 'kuendigung' ? 'Kündigung' : 'Kategorie'}
+    <div>
+      <div
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center justify-between pt-2">
+          <h1 className="text-xl font-bold">Verträge</h1>
+          <button onClick={() => { setEditVertrag(null); setFormOpen(true) }}
+            className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
+            <Plus size={16} /> Vertrag
           </button>
-        ))}
+        </div>
       </div>
+      <div className="px-4 pt-3 pb-8 space-y-5">
+        {/* Sort */}
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {(['abbuchung', 'kuendigung', 'kategorie'] as SortBy[]).map(s => (
+            <button key={s} onClick={() => setSortBy(s)}
+              className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${sortBy === s ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
+              {s === 'abbuchung' ? 'Abbuchung' : s === 'kuendigung' ? 'Kündigung' : 'Kategorie'}
+            </button>
+          ))}
+        </div>
 
       {/* Summary */}
       <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm flex items-center justify-between">
@@ -265,6 +270,7 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
           onCancel={() => setFormOpen(false)}
         />
       </Sheet>
+      </div>
     </div>
   )
 }

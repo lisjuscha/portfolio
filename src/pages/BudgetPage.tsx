@@ -99,8 +99,8 @@ export function BudgetPage({ ausgaben, vertraege, onAdd, onRemove }: Props) {
   return (
     <div>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pt-4 pb-3 border-b border-gray-200 dark:border-[#38383a]">
-        <div className="flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2">
             <button onClick={vorMonat} className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 active:bg-gray-200 dark:active:bg-[#2c2c2e]">
               <ChevronLeft size={20} />

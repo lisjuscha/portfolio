@@ -91,26 +91,30 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
   const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm"
 
   return (
-    <div className="px-4 py-4 pb-8 space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Anlagen</h1>
-        <button onClick={() => { setEditPosition(null); setPositionFormOpen(true) }}
-          className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
-          <Plus size={16} /> Position
-        </button>
-      </div>
-
-      {/* Group toggle */}
-      <div className="flex gap-2">
-        {(['konto', 'klasse'] as GroupBy[]).map(g => (
-          <button key={g} onClick={() => setGroupBy(g)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${groupBy === g ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
-            {g === 'konto' ? <Building2 size={14} /> : <LayoutList size={14} />}
-            {g === 'konto' ? 'nach Konto' : 'nach Klasse'}
+    <div>
+      <div
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center justify-between pt-2">
+          <h1 className="text-xl font-bold">Anlagen</h1>
+          <button onClick={() => { setEditPosition(null); setPositionFormOpen(true) }}
+            className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
+            <Plus size={16} /> Position
           </button>
-        ))}
+        </div>
       </div>
+      <div className="px-4 pt-3 pb-8 space-y-5">
+        {/* Group toggle */}
+        <div className="flex gap-2">
+          {(['konto', 'klasse'] as GroupBy[]).map(g => (
+            <button key={g} onClick={() => setGroupBy(g)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${groupBy === g ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
+              {g === 'konto' ? <Building2 size={14} /> : <LayoutList size={14} />}
+              {g === 'konto' ? 'nach Konto' : 'nach Klasse'}
+            </button>
+          ))}
+        </div>
 
       {/* Position list */}
       {groups.length === 0 ? (
@@ -328,6 +332,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
           </div>
         </form>
       </Sheet>
+      </div>
     </div>
   )
 }

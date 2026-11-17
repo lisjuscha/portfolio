@@ -77,19 +77,25 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
   }
 
   return (
-    <div className="px-4 py-4 space-y-5 pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Portfolio</h1>
-        <div className="flex items-center gap-2">
-          <button onClick={() => void handleRefresh()} className="p-2 text-gray-500 dark:text-gray-400 rounded-xl" aria-label="Kurse aktualisieren">
-            <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
-          </button>
-          <button onClick={onToggleHidden} className="p-2 text-gray-500 dark:text-gray-400 rounded-xl" aria-label={hidden ? 'Beträge anzeigen' : 'Beträge verbergen'}>
-            {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
+    <div>
+      {/* Sticky nav bar — solid background covers Dynamic Island zone */}
+      <div
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center justify-between pt-2">
+          <h1 className="text-xl font-bold">Portfolio</h1>
+          <div className="flex items-center gap-2">
+            <button onClick={() => void handleRefresh()} className="p-2 text-gray-500 dark:text-gray-400 rounded-xl" aria-label="Kurse aktualisieren">
+              <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+            </button>
+            <button onClick={onToggleHidden} className="p-2 text-gray-500 dark:text-gray-400 rounded-xl" aria-label={hidden ? 'Beträge anzeigen' : 'Beträge verbergen'}>
+              {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
       </div>
+      <div className="px-4 pt-2 space-y-5 pb-8">
 
       {/* Gesamtwert */}
       <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-5 shadow-sm">
@@ -224,6 +230,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
       {positionen.some(p => (p.anlageklasse === 'Aktie' || p.anlageklasse === 'ETF') && (p as import('../types').AktieETFPosition).kursZeitstempel) && (
         <p className="text-xs text-gray-400 text-center">Kurse können verzögert sein. Frühestens alle 15 Min. aktualisiert.</p>
       )}
+    </div>
     </div>
   )
 }

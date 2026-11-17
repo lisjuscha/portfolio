@@ -100,8 +100,14 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
   }
 
   return (
-    <div className="px-4 py-4 pb-8 space-y-5">
-      <h1 className="text-xl font-bold">Einstellungen</h1>
+    <div>
+      <div
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <h1 className="text-xl font-bold pt-2">Einstellungen</h1>
+      </div>
+      <div className="px-4 pt-4 pb-8 space-y-5">
 
       {/* Hide amounts */}
       <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm flex items-center justify-between">
@@ -271,6 +277,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
           onCancel={() => setKontoFormOpen(false)}
         />
       </Sheet>
+      </div>
     </div>
   )
 }

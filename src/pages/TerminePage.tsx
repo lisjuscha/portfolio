@@ -67,30 +67,35 @@ export function TerminePage({ positionen, vertraege, sparplaene }: Props) {
   }
 
   return (
-    <div className="px-4 py-4 pb-8 space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Termine</h1>
-        <button onClick={exportAll} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
-          <Download size={16} /> ICS
-        </button>
-      </div>
-
-      {/* Horizon */}
-      <div className="flex gap-2">
-        {[30, 90, 180, 365].map(d => (
-          <button key={d} onClick={() => setHorizont(d)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${horizont === d ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
-            {d}d
+    <div>
+      <div
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center justify-between pt-2">
+          <h1 className="text-xl font-bold">Termine</h1>
+          <button onClick={exportAll} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
+            <Download size={16} /> ICS
           </button>
-        ))}
+        </div>
       </div>
+      <div className="px-4 pt-3 pb-8 space-y-5">
+        {/* Horizon */}
+        <div className="flex gap-2">
+          {[30, 90, 180, 365].map(d => (
+            <button key={d} onClick={() => setHorizont(d)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${horizont === d ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
+              {d}d
+            </button>
+          ))}
+        </div>
 
-      {/* Type filter */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {(['alle', ...Object.keys(TYP_LABELS)] as TerminTypFilter[]).map(t => (
-          <button key={t} onClick={() => setFilter(t)}
-            className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${filter === t ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
-            {t === 'alle' ? 'Alle' : TYP_LABELS[t as TerminEvent['typ']]}
+        {/* Type filter */}
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {(['alle', ...Object.keys(TYP_LABELS)] as TerminTypFilter[]).map(t => (
+            <button key={t} onClick={() => setFilter(t)}
+              className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${filter === t ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
+              {t === 'alle' ? 'Alle' : TYP_LABELS[t as TerminEvent['typ']]}
           </button>
         ))}
       </div>
@@ -137,6 +142,7 @@ export function TerminePage({ positionen, vertraege, sparplaene }: Props) {
           })}
         </div>
       )}
+      </div>
     </div>
   )
 }
