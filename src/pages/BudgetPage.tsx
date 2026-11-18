@@ -122,7 +122,7 @@ export function BudgetPage({ ausgaben, vertraege, onAdd, onRemove }: Props) {
         </div>
       </div>
 
-      <div className="px-4 pt-4 space-y-4">
+      <div className="px-4 pt-4 space-y-4 pb-8">
         {/* Monthly totals */}
         <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
           <div className="flex items-center justify-between px-4 py-3">

@@ -30,9 +30,12 @@ export function Sheet({ open, onClose, title, children, fullscreen = false }: Pr
       <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
       <div
         className={`relative bg-white dark:bg-[#1c1c1e] rounded-t-2xl flex flex-col ${
-          fullscreen ? 'flex-1 mt-12' : 'max-h-[92dvh]'
+          fullscreen ? `flex-1` : 'max-h-[92dvh]'
         }`}
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+        style={{
+          marginTop: fullscreen ? 'max(env(safe-area-inset-top), 3rem)' : undefined,
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        }}
       >
         {/* Handle */}
         {!fullscreen && (
