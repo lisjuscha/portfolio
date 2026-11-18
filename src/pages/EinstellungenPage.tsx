@@ -146,7 +146,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
             {apiKeySaved ? '✓' : 'Speichern'}
           </button>
         </div>
-        <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+        <p className="text-xs text-[#4D0E12] dark:text-[#A5BCD6] flex items-center gap-1">
           <AlertTriangle size={12} /> Der Key wird lokal gespeichert und ist nur im verschlüsselten Backup enthalten.
         </p>
       </div>
@@ -250,7 +250,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
             </div>
           </div>
         )}
-        <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+        <p className="text-xs text-[#4D0E12] dark:text-[#A5BCD6] flex items-center gap-1">
           <AlertTriangle size={12} /> Import überschreibt alle lokalen Daten.
         </p>
       </div>
@@ -266,7 +266,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
         <p className="text-xs text-gray-400 leading-relaxed">
           Alle Daten liegen ausschließlich lokal auf diesem Gerät. Kein Server, keine Accounts, keine Analytik. Backups sind AES-GCM 256-bit verschlüsselt und können nur mit dem gewählten Passwort wiederhergestellt werden.
         </p>
-        <p className="text-xs text-amber-600 dark:text-amber-400 leading-relaxed">
+        <p className="text-xs text-[#4D0E12] dark:text-[#A5BCD6] leading-relaxed">
           Diese App dient rein privaten Zwecken und stellt keine Anlage-, Steuer- oder Rechtsberatung dar. Berechnungen sind Näherungen ohne Gewähr.
         </p>
       </div>

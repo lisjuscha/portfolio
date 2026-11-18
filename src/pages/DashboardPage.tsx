@@ -350,9 +350,9 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
 
       {/* Backup-Hinweis */}
       {backupWarning && (
-        <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-2xl text-sm">
-          <AlertCircle size={16} className="text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-amber-800 dark:text-amber-300">
+        <div className="flex items-center gap-2 px-4 py-3 bg-[#e8f0f7] dark:bg-[#1c1c1e] border border-[#d0e2f0] dark:border-[#38383a] rounded-2xl text-sm">
+          <AlertCircle size={16} className="text-[#4D0E12] dark:text-[#A5BCD6] shrink-0" />
+          <span className="text-[#4D0E12] dark:text-[#c2d4e6]">
             {lastBackup ? `Letztes Backup: ${formatDate(lastBackup)} — bitte sichern.` : 'Noch kein Backup erstellt — bitte sichern.'}
           </span>
         </div>
