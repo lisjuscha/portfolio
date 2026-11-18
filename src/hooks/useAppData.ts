@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf, AktieETFPosition, Ausgabe } from '../types'
+import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf, AktieETFPosition, Ausgabe, Einnahme, WiederkehrendeEinnahme, Schuld } from '../types'
 import {
   getAllKonten, putKonto, deleteKonto,
   getAllPositionen, putPosition, deletePosition,
@@ -9,6 +9,9 @@ import {
   getAllSnapshots, putSnapshot, getSnapshotForDate,
   getAllKaeufe, putKauf, deleteKauf,
   getAllAusgaben, putAusgabe, deleteAusgabe,
+  getAllEinnahmen, putEinnahme, deleteEinnahme,
+  getAllWiederkehrendeEinnahmen, putWiederkehrendeEinnahme, deleteWiederkehrendeEinnahme,
+  getAllSchulden, putSchuld, deleteSchuld,
 } from '../db'
 import { gesamtwertNachAnlageklasse, positionCurrentValue } from '../utils/calc'
 import { toISODate, today } from '../utils/format'
@@ -24,6 +27,9 @@ export interface AppData {
   snapshots: WertSnapshot[]
   kaeufe: Kauf[]
   ausgaben: Ausgabe[]
+  einnahmen: Einnahme[]
+  wiederkehrendeEinnahmen: WiederkehrendeEinnahme[]
+  schulden: Schuld[]
   fxRates: Record<string, number>
 
   saveKonto(k: Konto): Promise<void>
@@ -40,6 +46,12 @@ export interface AppData {
   removeKauf(id: string): Promise<void>
   saveAusgabe(a: Ausgabe): Promise<void>
   removeAusgabe(id: string): Promise<void>
+  saveEinnahme(e: Einnahme): Promise<void>
+  removeEinnahme(id: string): Promise<void>
+  saveWiederkehrendeEinnahme(w: WiederkehrendeEinnahme): Promise<void>
+  removeWiederkehrendeEinnahme(id: string): Promise<void>
+  saveSchuld(s: Schuld): Promise<void>
+  removeSchuld(id: string): Promise<void>
   refreshQuotes(): Promise<void>
 }
 
@@ -53,13 +65,17 @@ export function useAppData(): AppData {
   const [snapshots, setSnapshots] = useState<WertSnapshot[]>([])
   const [kaeufe, setKaeufe] = useState<Kauf[]>([])
   const [ausgaben, setAusgaben] = useState<Ausgabe[]>([])
+  const [einnahmen, setEinnahmen] = useState<Einnahme[]>([])
+  const [wiederkehrendeEinnahmen, setWiederkehrendeEinnahmen] = useState<WiederkehrendeEinnahme[]>([])
+  const [schulden, setSchulden] = useState<Schuld[]>([])
   const [fxRates, setFxRates] = useState<Record<string, number>>({})
   const loadedRef = useRef(false)
 
   const load = useCallback(async () => {
-    const [k, p, sp, sz, v, sn, ka, au] = await Promise.all([
+    const [k, p, sp, sz, v, sn, ka, au, ei, we, sc] = await Promise.all([
       getAllKonten(), getAllPositionen(), getAllSparplaene(),
       getAllSparziele(), getAllVertraege(), getAllSnapshots(), getAllKaeufe(), getAllAusgaben(),
+      getAllEinnahmen(), getAllWiederkehrendeEinnahmen(), getAllSchulden(),
     ])
     setKonten(k)
     setPositionen(p)
@@ -69,6 +85,9 @@ export function useAppData(): AppData {
     setSnapshots(sn.sort((a, b) => a.datum.localeCompare(b.datum)))
     setKaeufe(ka)
     setAusgaben(au)
+    setEinnahmen(ei)
+    setWiederkehrendeEinnahmen(we)
+    setSchulden(sc)
     setReady(true)
     return p
   }, [])
@@ -79,7 +98,6 @@ export function useAppData(): AppData {
       p.anlageklasse === 'Aktie' || p.anlageklasse === 'ETF'
     )
 
-    // Fetch FX rates for all non-EUR currencies
     const currencies = [...new Set(wertpapiere.map(p => p.waehrung).filter(c => c !== 'EUR'))]
     const rates: Record<string, number> = {}
     await Promise.allSettled(currencies.map(async c => {
@@ -87,7 +105,6 @@ export function useAppData(): AppData {
     }))
     setFxRates(rates)
 
-    // Fetch quotes for positions with a ticker
     const updated: Position[] = [...allPos]
     await Promise.allSettled(
       wertpapiere.filter(p => p.ticker).map(async p => {
@@ -183,7 +200,6 @@ export function useAppData(): AppData {
   const saveKauf = useCallback(async (k: Kauf) => {
     await putKauf(k)
     setKaeufe(prev => { const next = prev.filter(x => x.id !== k.id); return [...next, k] })
-    // Update position's average cost and quantity
     const pos = positionen.find(p => p.id === k.positionId)
     if (pos?.anlageklasse === 'Aktie' || pos?.anlageklasse === 'ETF') {
       const p = pos as import('../types').AktieETFPosition
@@ -217,11 +233,43 @@ export function useAppData(): AppData {
     setAusgaben(prev => prev.filter(x => x.id !== id))
   }, [])
 
+  const saveEinnahme = useCallback(async (e: Einnahme) => {
+    await putEinnahme(e)
+    setEinnahmen(prev => { const next = prev.filter(x => x.id !== e.id); return [...next, e] })
+  }, [])
+  const removeEinnahme = useCallback(async (id: string) => {
+    await deleteEinnahme(id)
+    setEinnahmen(prev => prev.filter(x => x.id !== id))
+  }, [])
+
+  const saveWiederkehrendeEinnahme = useCallback(async (w: WiederkehrendeEinnahme) => {
+    await putWiederkehrendeEinnahme(w)
+    setWiederkehrendeEinnahmen(prev => { const next = prev.filter(x => x.id !== w.id); return [...next, w] })
+  }, [])
+  const removeWiederkehrendeEinnahme = useCallback(async (id: string) => {
+    await deleteWiederkehrendeEinnahme(id)
+    setWiederkehrendeEinnahmen(prev => prev.filter(x => x.id !== id))
+  }, [])
+
+  const saveSchuld = useCallback(async (s: Schuld) => {
+    await putSchuld(s)
+    setSchulden(prev => { const next = prev.filter(x => x.id !== s.id); return [...next, s] })
+  }, [])
+  const removeSchuld = useCallback(async (id: string) => {
+    await deleteSchuld(id)
+    setSchulden(prev => prev.filter(x => x.id !== id))
+  }, [])
+
   return {
-    ready, konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe, ausgaben, fxRates,
+    ready, konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe,
+    ausgaben, einnahmen, wiederkehrendeEinnahmen, schulden, fxRates,
     saveKonto, removeKonto, savePosition, removePosition,
     saveSparplan, removeSparplan, saveSparziel, removeSparziel,
     saveVertrag, removeVertrag, saveKauf, removeKauf,
-    saveAusgabe, removeAusgabe, refreshQuotes,
+    saveAusgabe, removeAusgabe,
+    saveEinnahme, removeEinnahme,
+    saveWiederkehrendeEinnahme, removeWiederkehrendeEinnahme,
+    saveSchuld, removeSchuld,
+    refreshQuotes,
   }
 }

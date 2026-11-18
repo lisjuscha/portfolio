@@ -40,6 +40,7 @@ export interface AktieETFPosition extends PositionBase {
   waehrung: string
   aktuellerKurs?: number
   kursZeitstempel?: string
+  jaehresDividende?: number  // EUR/Jahr gesamt
 }
 
 export interface ZinsPosition extends PositionBase {
@@ -135,3 +136,52 @@ export interface Ausgabe {
   kategorie: AusgabenKategorie
   beschreibung?: string
 }
+
+// ─── Neue Typen ───────────────────────────────────────────────────────────────
+
+export type EinnahmeKategorie =
+  | 'Gehalt'
+  | 'Bonus'
+  | 'Dividende'
+  | 'Zinsen'
+  | 'Mieteinnahmen'
+  | 'Freelance'
+  | 'Sonstiges'
+
+export interface Einnahme {
+  id: string
+  datum: string
+  betrag: number
+  kategorie: EinnahmeKategorie
+  beschreibung?: string
+}
+
+export interface WiederkehrendeEinnahme {
+  id: string
+  name: string
+  betrag: number
+  zahlungsintervall: Zahlungsintervall
+  naechsteZahlung: string
+  kategorie: EinnahmeKategorie
+  status: 'aktiv' | 'inaktiv'
+}
+
+export type SchuldKategorie =
+  | 'Hypothek'
+  | 'Ratenkredit'
+  | 'Dispokredit'
+  | 'Studentenkredit'
+  | 'Sonstiges'
+
+export interface Schuld {
+  id: string
+  name: string
+  glaeubiger: string
+  restbetrag: number
+  zinssatz: number
+  monatlicheRate: number
+  startDatum: string
+  endDatum?: string
+  kategorie: SchuldKategorie
+}
+

@@ -9,9 +9,10 @@ import type { Konto } from '../types'
 interface Props extends AppData {
   hidden: boolean
   onToggleHidden: () => void
+  embedded?: boolean
 }
 
-export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, removeKonto }: Props) {
+export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, removeKonto, embedded }: Props) {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('portfolioApiKey') ?? '')
   const [apiKeySaved, setApiKeySaved] = useState(false)
   const [backupStatus, setBackupStatus] = useState<string | null>(null)
@@ -101,12 +102,14 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
 
   return (
     <div>
-      <div
-        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        <h1 className="text-xl font-bold pt-2">Einstellungen</h1>
-      </div>
+      {!embedded && (
+        <div
+          className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <h1 className="text-xl font-bold pt-2">Einstellungen</h1>
+        </div>
+      )}
       <div className="px-4 pt-4 pb-8 space-y-5">
 
       {/* Hide amounts */}

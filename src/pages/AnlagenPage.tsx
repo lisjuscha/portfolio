@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { Plus, ChevronRight, Pencil, Trash2, ShoppingCart, LayoutList, Building2, TrendingUp, TrendingDown } from 'lucide-react'
 import type { AppData } from '../hooks/useAppData'
-import type { Position, AktieETFPosition, ZinsPosition, Kauf } from '../types'
-import { positionCurrentValue, positionPerformance, erwarteterZinsertrag, sparzielFortschritt } from '../utils/calc'
+import type { Position, AktieETFPosition, ZinsPosition, Kauf, Anlageklasse } from '../types'
+import { positionCurrentValue, positionPerformance, erwarteterZinsertrag, sparzielFortschritt, gesamtwertNachAnlageklasse } from '../utils/calc'
 import { formatEuro, formatPct, formatDate, today } from '../utils/format'
 import { Sheet } from '../components/Sheet'
 import { PositionForm } from '../forms/PositionForm'
@@ -12,12 +12,16 @@ import { ProgressBar } from '../components/ProgressBar'
 import { ANLAGEKLASSE_COLORS } from '../components/DonutChart'
 
 type GroupBy = 'konto' | 'klasse'
+type AnlagenView = 'liste' | 'rebalancing' | 'ertraege'
 
 interface Props extends AppData {
   hidden: boolean
 }
 
+const MONATE_KURZ = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
+
 export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele, fxRates, savePosition, removePosition, saveSparplan, saveSparziel, removeSparziel, saveKauf }: Props) {
+  const [view, setView] = useState<AnlagenView>('liste')
   const [groupBy, setGroupBy] = useState<GroupBy>('konto')
   const [editPosition, setEditPosition] = useState<Position | null>(null)
   const [positionFormOpen, setPositionFormOpen] = useState(false)
@@ -31,6 +35,77 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
   const [kaufDatum, setKaufDatum] = useState(today().toISOString().slice(0, 10))
 
   const gesamtwert = useMemo(() => positionen.reduce((s, p) => s + positionCurrentValue(p, fxRates), 0), [positionen, fxRates])
+
+  // ─── Rebalancing ─────────────────────────────────────────────────────────────
+  const istAllokation = useMemo(() => gesamtwertNachAnlageklasse(positionen, fxRates), [positionen, fxRates])
+
+  const [zielAllokation, setZielAllokation] = useState<Partial<Record<Anlageklasse, string>>>(() => {
+    try {
+      const raw = localStorage.getItem('zielallokation')
+      return raw ? JSON.parse(raw) : {}
+    } catch { return {} }
+  })
+
+  function setZiel(klasse: Anlageklasse, val: string) {
+    const next = { ...zielAllokation, [klasse]: val }
+    setZielAllokation(next)
+    localStorage.setItem('zielallokation', JSON.stringify(next))
+  }
+
+  const rebalancingRows = useMemo(() => {
+    const klassen = Object.keys(istAllokation) as Anlageklasse[]
+    return klassen.map(k => {
+      const istWert = istAllokation[k] ?? 0
+      const istPct = gesamtwert > 0 ? (istWert / gesamtwert) * 100 : 0
+      const sollPct = Number(zielAllokation[k] ?? 0)
+      const delta = sollPct > 0 ? (sollPct - istPct) * gesamtwert / 100 : 0
+      const deltaPct = sollPct - istPct
+      return { klasse: k, istWert, istPct, sollPct, delta, deltaPct }
+    }).sort((a, b) => b.istWert - a.istWert)
+  }, [istAllokation, zielAllokation, gesamtwert])
+
+  // ─── Ertragskalender ──────────────────────────────────────────────────────────
+  const ertragskalender = useMemo(() => {
+    const now = new Date()
+    const months: { monat: number; jahr: number; label: string; eintraege: { name: string; betrag: number; typ: 'Zinsen' | 'Dividende' }[] }[] = []
+
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
+      months.push({ monat: d.getMonth(), jahr: d.getFullYear(), label: `${MONATE_KURZ[d.getMonth()]} ${d.getFullYear()}`, eintraege: [] })
+    }
+
+    // Zinsen aus ZinsPositionen
+    const zinsPoz = positionen.filter((p): p is ZinsPosition =>
+      p.anlageklasse === 'Zinssparen' || p.anlageklasse === 'Sparbrief' || p.anlageklasse === 'Festgeld'
+    )
+    for (const pos of zinsPoz) {
+      const faelligkeitDate = new Date(pos.laufzeitEnde)
+      for (const entry of months) {
+        if (faelligkeitDate.getFullYear() === entry.jahr && faelligkeitDate.getMonth() === entry.monat) {
+          const zins = erwarteterZinsertrag(pos)
+          if (zins > 0) {
+            entry.eintraege.push({ name: pos.name, betrag: zins, typ: 'Zinsen' })
+          }
+        }
+      }
+    }
+
+    // Dividenden aus AktieETF (Q1-Q4 gleichverteilt = je 1/4 im März, Juni, Sep, Dez)
+    const divPoz = positionen.filter((p): p is AktieETFPosition =>
+      (p.anlageklasse === 'Aktie' || p.anlageklasse === 'ETF') && (p as AktieETFPosition).jaehresDividende != null
+    ) as AktieETFPosition[]
+    const divMonate = [2, 5, 8, 11] // März=2, Jun=5, Sep=8, Dez=11
+    for (const pos of divPoz) {
+      const quartalDiv = pos.jaehresDividende! / 4
+      for (const entry of months) {
+        if (divMonate.includes(entry.monat)) {
+          entry.eintraege.push({ name: pos.name, betrag: quartalDiv, typ: 'Dividende' })
+        }
+      }
+    }
+
+    return months.filter(m => m.eintraege.length > 0)
+  }, [positionen])
 
   // Group by konto or anlageklasse
   const groups = useMemo(() => {
@@ -93,17 +168,35 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
   return (
     <div>
       <div
-        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-2">
-          <h1 className="text-xl font-bold">Anlagen</h1>
-          <button onClick={() => { setEditPosition(null); setPositionFormOpen(true) }}
-            className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
-            <Plus size={16} /> Position
-          </button>
+          <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
+            {(['liste', 'rebalancing', 'ertraege'] as AnlagenView[]).map(v => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  view === v
+                    ? 'bg-white dark:bg-[#3a3a3c] text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-[#8e8e93]'
+                }`}
+              >
+                {v === 'liste' ? 'Liste' : v === 'rebalancing' ? 'Rebalancing' : 'Erträge'}
+              </button>
+            ))}
+          </div>
+          {view === 'liste' && (
+            <button onClick={() => { setEditPosition(null); setPositionFormOpen(true) }}
+              className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
+              <Plus size={16} /> Position
+            </button>
+          )}
         </div>
       </div>
+
+      {view === 'liste' ? (
       <div className="px-4 pt-3 pb-8 space-y-5">
         {/* Group toggle */}
         <div className="flex gap-2">
@@ -333,6 +426,102 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
         </form>
       </Sheet>
       </div>
+
+      ) : view === 'rebalancing' ? (
+      <div className="px-4 pt-3 pb-8 space-y-5">
+        {positionen.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 text-sm">Noch keine Positionen für Rebalancing.</div>
+        ) : (
+          <>
+            <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
+              <p className="text-xs text-gray-400 mb-3">Zielallokation in % pro Anlageklasse eingeben. Delta zeigt, wie viel gekauft (+) oder verkauft (−) werden soll.</p>
+              <div className="space-y-3">
+                {rebalancingRows.map(row => {
+                  const color = ANLAGEKLASSE_COLORS[row.klasse] ?? '#6b7280'
+                  return (
+                    <div key={row.klasse} className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                          <span className="text-sm font-medium">{row.klasse}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.5"
+                            value={zielAllokation[row.klasse] ?? ''}
+                            onChange={e => setZiel(row.klasse, e.target.value)}
+                            placeholder="0"
+                            className="w-16 px-2 py-1 text-sm text-right rounded-lg border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e]"
+                          />
+                          <span className="text-xs text-gray-400 w-4">%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500 pl-4">
+                        <span>Ist {row.istPct.toFixed(1)}% · {hidden ? '••••' : formatEuro(row.istWert)}</span>
+                        {row.sollPct > 0 && (
+                          <span className={`font-semibold tabular-nums ${row.delta >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                            {row.delta >= 0 ? '+' : ''}{hidden ? '••••' : formatEuro(row.delta)} ({row.deltaPct >= 0 ? '+' : ''}{row.deltaPct.toFixed(1)}%)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="flex justify-between items-center px-2">
+              <span className="text-xs text-gray-400">Gesamtwert</span>
+              <span className="text-sm font-bold tabular-nums">{hidden ? '••••' : formatEuro(gesamtwert)}</span>
+            </div>
+          </>
+        )}
+      </div>
+
+      ) : (
+      <div className="px-4 pt-3 pb-8 space-y-5">
+        {ertragskalender.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 text-sm">Keine Erträge in den nächsten 12 Monaten gefunden.</div>
+        ) : (
+          <>
+            <div className="flex justify-between items-center px-1">
+              <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">12-Monats-Vorschau</span>
+              <span className="text-sm font-bold tabular-nums">
+                {hidden ? '••••' : formatEuro(ertragskalender.reduce((s, m) => s + m.eintraege.reduce((ss, e) => ss + e.betrag, 0), 0))}
+              </span>
+            </div>
+            {ertragskalender.map(m => {
+              const monatsTotal = m.eintraege.reduce((s, e) => s + e.betrag, 0)
+              return (
+                <div key={`${m.jahr}-${m.monat}`} className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#38383a]">
+                    <span className="text-sm font-semibold">{m.label}</span>
+                    <span className="text-sm font-bold tabular-nums text-green-600 dark:text-green-400">
+                      {hidden ? '••••' : `+${formatEuro(monatsTotal)}`}
+                    </span>
+                  </div>
+                  {m.eintraege.map((e, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-2.5 border-b border-gray-50 dark:border-[#2c2c2e] last:border-0">
+                      <div>
+                        <span className="text-sm">{e.name}</span>
+                        <span className={`ml-2 text-xs px-1.5 py-0.5 rounded font-medium ${
+                          e.typ === 'Zinsen'
+                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                            : 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                        }`}>{e.typ}</span>
+                      </div>
+                      <span className="text-sm tabular-nums font-medium">{hidden ? '••••' : formatEuro(e.betrag)}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })}
+          </>
+        )}
+      </div>
+      )}
     </div>
   )
 }

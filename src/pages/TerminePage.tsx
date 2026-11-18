@@ -23,9 +23,11 @@ const TYP_COLORS: Record<TerminEvent['typ'], string> = {
   'vl-sperrfrist': '#7c3aed',
 }
 
-interface Props extends AppData {}
+interface Props extends AppData {
+  embedded?: boolean
+}
 
-export function TerminePage({ positionen, vertraege, sparplaene }: Props) {
+export function TerminePage({ positionen, vertraege, sparplaene, embedded }: Props) {
   const [filter, setFilter] = useState<TerminTypFilter>('alle')
   const [horizont, setHorizont] = useState(90)
 
@@ -68,17 +70,19 @@ export function TerminePage({ positionen, vertraege, sparplaene }: Props) {
 
   return (
     <div>
-      <div
-        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        <div className="flex items-center justify-between pt-2">
-          <h1 className="text-xl font-bold">Termine</h1>
-          <button onClick={exportAll} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
-            <Download size={16} /> ICS
-          </button>
+      {!embedded && (
+        <div
+          className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <div className="flex items-center justify-between pt-2">
+            <h1 className="text-xl font-bold">Termine</h1>
+            <button onClick={exportAll} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
+              <Download size={16} /> ICS
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       <div className="px-4 pt-3 pb-8 space-y-5">
         {/* Horizon */}
         <div className="flex gap-2">

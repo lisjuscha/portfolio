@@ -1,14 +1,13 @@
-import { LayoutDashboard, TrendingUp, FileText, Calendar, Settings, Wallet } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, FileText, Wallet, MoreHorizontal } from 'lucide-react'
 
-export type Tab = 'dashboard' | 'anlagen' | 'vertraege' | 'termine' | 'budget' | 'einstellungen'
+export type Tab = 'dashboard' | 'anlagen' | 'vertraege' | 'budget' | 'mehr'
 
 const TABS: { id: Tab; icon: typeof LayoutDashboard; label: string }[] = [
   { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { id: 'anlagen', icon: TrendingUp, label: 'Anlagen' },
   { id: 'vertraege', icon: FileText, label: 'Verträge' },
-  { id: 'termine', icon: Calendar, label: 'Termine' },
   { id: 'budget', icon: Wallet, label: 'Budget' },
-  { id: 'einstellungen', icon: Settings, label: 'Mehr' },
+  { id: 'mehr', icon: MoreHorizontal, label: 'Mehr' },
 ]
 
 interface Props {

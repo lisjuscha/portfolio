@@ -1,6 +1,6 @@
 import { openDB } from 'idb'
 import type { DBSchema, IDBPDatabase } from 'idb'
-import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf, Ausgabe } from '../types'
+import type { Konto, Position, Sparplan, Sparziel, Vertrag, WertSnapshot, Kauf, Ausgabe, Einnahme, WiederkehrendeEinnahme, Schuld } from '../types'
 import { encryptBackup, decryptBackup } from '../utils/crypto'
 
 interface PortfolioDB extends DBSchema {
@@ -12,13 +12,16 @@ interface PortfolioDB extends DBSchema {
   snapshots: { key: string; value: WertSnapshot; indexes: { 'by-datum': string } }
   kaeufe: { key: string; value: Kauf; indexes: { 'by-position': string } }
   ausgaben: { key: string; value: Ausgabe; indexes: { 'by-datum': string } }
+  einnahmen: { key: string; value: Einnahme; indexes: { 'by-datum': string } }
+  wiederkehrendeEinnahmen: { key: string; value: WiederkehrendeEinnahme }
+  schulden: { key: string; value: Schuld }
 }
 
 let dbInstance: IDBPDatabase<PortfolioDB> | null = null
 
 export async function getDB(): Promise<IDBPDatabase<PortfolioDB>> {
   if (dbInstance) return dbInstance
-  dbInstance = await openDB<PortfolioDB>('portfolio', 2, {
+  dbInstance = await openDB<PortfolioDB>('portfolio', 3, {
     upgrade(db, oldVersion) {
       if (oldVersion < 1) {
         db.createObjectStore('konten', { keyPath: 'id' })
@@ -35,6 +38,12 @@ export async function getDB(): Promise<IDBPDatabase<PortfolioDB>> {
       if (oldVersion < 2) {
         const ausgabenStore = db.createObjectStore('ausgaben', { keyPath: 'id' })
         ausgabenStore.createIndex('by-datum', 'datum')
+      }
+      if (oldVersion < 3) {
+        const einnahmenStore = db.createObjectStore('einnahmen', { keyPath: 'id' })
+        einnahmenStore.createIndex('by-datum', 'datum')
+        db.createObjectStore('wiederkehrendeEinnahmen', { keyPath: 'id' })
+        db.createObjectStore('schulden', { keyPath: 'id' })
       }
     },
   })
@@ -64,7 +73,6 @@ export async function putPosition(p: Position): Promise<void> {
 export async function deletePosition(id: string): Promise<void> {
   const db = await getDB()
   await db.delete('positionen', id)
-  // Also delete related sparplans and purchases
   const sparplaene = await db.getAllFromIndex('sparplaene', 'by-position', id)
   await Promise.all(sparplaene.map(s => db.delete('sparplaene', s.id)))
   const kaeufe = await db.getAllFromIndex('kaeufe', 'by-position', id)
@@ -149,10 +157,46 @@ export async function deleteAusgabe(id: string): Promise<void> {
   await (await getDB()).delete('ausgaben', id)
 }
 
+// ─── Einnahmen ────────────────────────────────────────────────────────────────
+
+export async function getAllEinnahmen(): Promise<Einnahme[]> {
+  return (await getDB()).getAll('einnahmen')
+}
+export async function putEinnahme(e: Einnahme): Promise<void> {
+  await (await getDB()).put('einnahmen', e)
+}
+export async function deleteEinnahme(id: string): Promise<void> {
+  await (await getDB()).delete('einnahmen', id)
+}
+
+// ─── WiederkehrendeEinnahmen ──────────────────────────────────────────────────
+
+export async function getAllWiederkehrendeEinnahmen(): Promise<WiederkehrendeEinnahme[]> {
+  return (await getDB()).getAll('wiederkehrendeEinnahmen')
+}
+export async function putWiederkehrendeEinnahme(w: WiederkehrendeEinnahme): Promise<void> {
+  await (await getDB()).put('wiederkehrendeEinnahmen', w)
+}
+export async function deleteWiederkehrendeEinnahme(id: string): Promise<void> {
+  await (await getDB()).delete('wiederkehrendeEinnahmen', id)
+}
+
+// ─── Schulden ─────────────────────────────────────────────────────────────────
+
+export async function getAllSchulden(): Promise<Schuld[]> {
+  return (await getDB()).getAll('schulden')
+}
+export async function putSchuld(s: Schuld): Promise<void> {
+  await (await getDB()).put('schulden', s)
+}
+export async function deleteSchuld(id: string): Promise<void> {
+  await (await getDB()).delete('schulden', id)
+}
+
 // ─── Backup ───────────────────────────────────────────────────────────────────
 
 export interface BackupPayload {
-  version: 2
+  version: 3
   exportedAt: string
   apiKey: string | null
   konten: Konto[]
@@ -163,11 +207,17 @@ export interface BackupPayload {
   snapshots: WertSnapshot[]
   kaeufe: Kauf[]
   ausgaben: Ausgabe[]
+  einnahmen: Einnahme[]
+  wiederkehrendeEinnahmen: WiederkehrendeEinnahme[]
+  schulden: Schuld[]
 }
 
 export async function exportAllData(): Promise<BackupPayload> {
   const db = await getDB()
-  const [konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe, ausgaben] = await Promise.all([
+  const [
+    konten, positionen, sparplaene, sparziele, vertraege,
+    snapshots, kaeufe, ausgaben, einnahmen, wiederkehrendeEinnahmen, schulden,
+  ] = await Promise.all([
     db.getAll('konten'),
     db.getAll('positionen'),
     db.getAll('sparplaene'),
@@ -176,18 +226,25 @@ export async function exportAllData(): Promise<BackupPayload> {
     db.getAll('snapshots'),
     db.getAll('kaeufe'),
     db.getAll('ausgaben'),
+    db.getAll('einnahmen'),
+    db.getAll('wiederkehrendeEinnahmen'),
+    db.getAll('schulden'),
   ])
   return {
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
     apiKey: localStorage.getItem('portfolioApiKey'),
-    konten, positionen, sparplaene, sparziele, vertraege, snapshots, kaeufe, ausgaben,
+    konten, positionen, sparplaene, sparziele, vertraege,
+    snapshots, kaeufe, ausgaben, einnahmen, wiederkehrendeEinnahmen, schulden,
   }
 }
 
 export async function importAllData(payload: BackupPayload): Promise<void> {
   const db = await getDB()
-  const stores = ['konten', 'positionen', 'sparplaene', 'sparziele', 'vertraege', 'snapshots', 'kaeufe', 'ausgaben'] as const
+  const stores = [
+    'konten', 'positionen', 'sparplaene', 'sparziele', 'vertraege',
+    'snapshots', 'kaeufe', 'ausgaben', 'einnahmen', 'wiederkehrendeEinnahmen', 'schulden',
+  ] as const
   const clearTx = db.transaction(stores, 'readwrite')
   await Promise.all(stores.map(s => clearTx.objectStore(s).clear()))
   await clearTx.done
@@ -202,6 +259,9 @@ export async function importAllData(payload: BackupPayload): Promise<void> {
     ...(payload.snapshots ?? []).map(r => writeTx.objectStore('snapshots').put(r)),
     ...(payload.kaeufe ?? []).map(r => writeTx.objectStore('kaeufe').put(r)),
     ...(payload.ausgaben ?? []).map(r => writeTx.objectStore('ausgaben').put(r)),
+    ...(payload.einnahmen ?? []).map(r => writeTx.objectStore('einnahmen').put(r)),
+    ...(payload.wiederkehrendeEinnahmen ?? []).map(r => writeTx.objectStore('wiederkehrendeEinnahmen').put(r)),
+    ...(payload.schulden ?? []).map(r => writeTx.objectStore('schulden').put(r)),
   ])
   await writeTx.done
 
@@ -219,7 +279,8 @@ export async function exportEncrypted(password: string): Promise<string> {
 export async function importEncrypted(ciphertext: string, password: string): Promise<BackupPayload> {
   const json = await decryptBackup(ciphertext, password)
   const payload = JSON.parse(json) as BackupPayload
-  if (payload.version !== 2 && (payload as { version: number }).version !== 1) {
+  const v = (payload as { version: number }).version
+  if (v !== 3 && v !== 2 && v !== 1) {
     throw new Error('Unbekanntes Backup-Format')
   }
   return payload

@@ -2,12 +2,12 @@ import { useState, useMemo } from 'react'
 import { Eye, EyeOff, TrendingUp, TrendingDown, Plus, RefreshCw, AlertCircle } from 'lucide-react'
 import type { AppData } from '../hooks/useAppData'
 import type { ZeitraumFilter, SparzielFortschritt as SparzielFortschrittType } from '../utils/calc'
-import { filterSnapshots, positionCurrentValue, sparzielFortschritt, gesamtwertNachAnlageklasse, intervallZuMonatsbetrag } from '../utils/calc'
+import { filterSnapshots, positionCurrentValue, sparzielFortschritt, gesamtwertNachAnlageklasse, intervallZuMonatsbetrag, intervallZuMonatsbetrag as weMonat, erwarteterZinsertrag } from '../utils/calc'
 import { formatEuro, formatPct, formatDate, daysBetween, today } from '../utils/format'
 import { DonutChart, ANLAGEKLASSE_COLORS } from '../components/DonutChart'
 import { LineChart } from '../components/LineChart'
 import { ProgressBar } from '../components/ProgressBar'
-import type { ZinsPosition, VLPosition } from '../types'
+import type { ZinsPosition, VLPosition, AktieETFPosition } from '../types'
 import { collectTermine } from '../utils/ics'
 
 interface Props extends AppData {
@@ -20,7 +20,7 @@ interface Props extends AppData {
 
 const ZEITRAEUME: ZeitraumFilter[] = ['1M', '6M', '1J', 'Max']
 
-export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positionen, sparplaene, vertraege, snapshots, sparziele, konten, fxRates, onOpenPositionForm, onOpenVertragForm }: Props) {
+export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positionen, sparplaene, vertraege, snapshots, sparziele, konten, fxRates, onOpenPositionForm, onOpenVertragForm, schulden, einnahmen, wiederkehrendeEinnahmen, ausgaben }: Props) {
   const [zeitraum, setZeitraum] = useState<ZeitraumFilter>('1M')
   const [refreshing, setRefreshing] = useState(false)
 
@@ -28,6 +28,13 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
     () => positionen.reduce((s, p) => s + positionCurrentValue(p, fxRates), 0),
     [positionen, fxRates]
   )
+
+  const schuldenGesamt = useMemo(
+    () => schulden.reduce((s, d) => s + d.restbetrag, 0),
+    [schulden]
+  )
+
+  const nettovermoegen = gesamtwert - schuldenGesamt
 
   const filteredSnapshots = useMemo(() => filterSnapshots(snapshots, zeitraum), [snapshots, zeitraum])
 
@@ -68,6 +75,68 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
     [vertraege]
   )
 
+  // ─── Monatsbilanz-Mini ────────────────────────────────────────────────────────
+  const monatsbilanz = useMemo(() => {
+    const now = new Date()
+    const prefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    const varEinnahmen = einnahmen.filter(e => e.datum.startsWith(prefix)).reduce((s, e) => s + e.betrag, 0)
+    const weGesamt = wiederkehrendeEinnahmen
+      .filter(w => w.status === 'aktiv')
+      .reduce((s, w) => s + weMonat(w.betrag, w.zahlungsintervall), 0)
+    const einnahmenGesamt = varEinnahmen + weGesamt
+    if (einnahmenGesamt === 0) return null
+    const ausgabenMonat = ausgaben.filter(a => a.datum.startsWith(prefix)).reduce((s, a) => s + a.betrag, 0)
+    const bilanz = einnahmenGesamt - ausgabenMonat - fixkostenMonat
+    const sparquote = einnahmenGesamt > 0 ? (bilanz / einnahmenGesamt) * 100 : 0
+    return { einnahmen: einnahmenGesamt, ausgaben: ausgabenMonat + fixkostenMonat, bilanz, sparquote }
+  }, [einnahmen, wiederkehrendeEinnahmen, ausgaben, fixkostenMonat])
+
+  // ─── Notfallrücklage-Mini ─────────────────────────────────────────────────────
+  const notfallMini = useMemo(() => {
+    const tgKonten = konten.filter(k => k.typ === 'Tagesgeld').map(k => k.id)
+    const tgWert = positionen
+      .filter(p => tgKonten.includes(p.kontoId))
+      .reduce((s, p) => s + positionCurrentValue(p, fxRates), 0)
+    if (tgKonten.length === 0) return null
+    const zielMonate = Number(localStorage.getItem('notfallMonatsziel') || 3)
+    const now = new Date()
+    let sum = 0; let count = 0
+    for (let i = 1; i <= 3; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const pfx = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const total = ausgaben.filter(a => a.datum.startsWith(pfx)).reduce((s, a) => s + a.betrag, 0)
+      if (total > 0) { sum += total; count++ }
+    }
+    const avg = count > 0 ? sum / count : 0
+    if (avg === 0) return { tgWert, zielMonate, ziel: 0 }
+    return { tgWert, zielMonate, ziel: zielMonate * avg }
+  }, [konten, positionen, ausgaben, fxRates])
+
+  // ─── Freistellungsauftrag-Mini ────────────────────────────────────────────────
+  const freistellungMini = useMemo(() => {
+    const gemeinsam = localStorage.getItem('freistellungGemeinsam') === '1'
+    const limit = gemeinsam ? 2000 : 1000
+    const now = new Date()
+    const jahresanfang = new Date(now.getFullYear(), 0, 1)
+    const zinsen = positionen
+      .filter((p): p is ZinsPosition =>
+        p.anlageklasse === 'Zinssparen' || p.anlageklasse === 'Sparbrief' || p.anlageklasse === 'Festgeld'
+      )
+      .reduce((s, p) => {
+        const jahresBeginn = erwarteterZinsertrag(p, jahresanfang)
+        const jahresJetzt = erwarteterZinsertrag(p, now)
+        return s + Math.max(0, jahresJetzt - jahresBeginn)
+      }, 0)
+    const dividenden = positionen
+      .filter((p): p is AktieETFPosition =>
+        (p.anlageklasse === 'Aktie' || p.anlageklasse === 'ETF') && p.jaehresDividende != null
+      )
+      .reduce((s, p) => s + (p.jaehresDividende! * (now.getMonth() + 1) / 12), 0)
+    const ertraege = zinsen + dividenden
+    if (ertraege === 0) return null
+    return { ertraege, limit, pct: Math.min(100, (ertraege / limit) * 100) }
+  }, [positionen])
+
   const lastBackup = localStorage.getItem('lastBackup')
   const backupWarning = !lastBackup || daysBetween(new Date(lastBackup), today()) < -30
 
@@ -103,6 +172,14 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
         <p className="text-4xl font-bold tabular-nums tracking-tight">
           {formatEuro(gesamtwert, hidden)}
         </p>
+        {schuldenGesamt > 0 && (
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-[#38383a]">
+            <span className="text-xs text-gray-400">Nettovermögen (nach Schulden)</span>
+            <span className={`text-sm font-semibold tabular-nums ${nettovermoegen >= 0 ? 'text-gray-800 dark:text-gray-200' : 'text-red-500'}`}>
+              {hidden ? '••••' : formatEuro(nettovermoegen)}
+            </span>
+          </div>
+        )}
         {delta !== null && !hidden && (
           <div className={`flex items-center gap-1 mt-2 text-sm font-medium ${delta.absolut >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {delta.absolut >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
@@ -112,6 +189,61 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
           </div>
         )}
       </div>
+
+      {/* Monatsbilanz-Mini */}
+      {monatsbilanz && (
+        <div className={`bg-white dark:bg-[#1c1c1e] rounded-2xl px-4 py-3 shadow-sm ${monatsbilanz.bilanz >= 0 ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'}`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-400 mb-0.5">Monatsbilanz</p>
+              <p className={`text-lg font-bold tabular-nums ${monatsbilanz.bilanz >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {monatsbilanz.bilanz >= 0 ? '+' : ''}{hidden ? '••••' : formatEuro(monatsbilanz.bilanz)}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-gray-400 mb-0.5">Sparquote</p>
+              <p className={`text-lg font-bold tabular-nums ${monatsbilanz.sparquote >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                {monatsbilanz.sparquote.toFixed(0)} %
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notfallrücklage-Mini */}
+      {notfallMini && notfallMini.ziel > 0 && (
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold">Notfallrücklage</p>
+            <p className="text-xs text-gray-400">{notfallMini.zielMonate} Monate Ziel</p>
+          </div>
+          <ProgressBar
+            value={notfallMini.tgWert}
+            max={notfallMini.ziel}
+            sublabel={`${hidden ? '••••' : formatEuro(notfallMini.tgWert)} / ${hidden ? '••••' : formatEuro(notfallMini.ziel)}`}
+            hidden={hidden}
+          />
+        </div>
+      )}
+
+      {/* Freistellungsauftrag-Mini */}
+      {freistellungMini && (
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl px-4 py-3 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold">Freistellungsauftrag</p>
+            <p className="text-xs text-gray-400">{hidden ? '••••' : formatEuro(freistellungMini.ertraege)} / {formatEuro(freistellungMini.limit)}</p>
+          </div>
+          <div className="h-2 bg-gray-100 dark:bg-[#38383a] rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${freistellungMini.pct}%`,
+                backgroundColor: freistellungMini.pct >= 90 ? '#ff3b30' : freistellungMini.pct >= 70 ? '#ff9500' : '#34c759'
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Verlauf */}
       <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">

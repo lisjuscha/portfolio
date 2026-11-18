@@ -8,6 +8,7 @@ import { Sheet } from '../components/Sheet'
 import { VertragForm } from '../forms/VertragForm'
 import { generateVertragIcs, generateAlleTermineIcs } from '../utils/ics'
 import type { ZinsPosition, VLPosition } from '../types'
+import { TerminePage } from './TerminePage'
 
 type SortBy = 'abbuchung' | 'kuendigung' | 'kategorie'
 
@@ -47,7 +48,8 @@ function downloadIcs(content: string, filename: string) {
   void share()
 }
 
-export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveVertrag, removeVertrag }: Props) {
+export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveVertrag, removeVertrag, ...rest }: Props) {
+  const [view, setView] = useState<'vertraege' | 'termine'>('vertraege')
   const [sortBy, setSortBy] = useState<SortBy>('abbuchung')
   const [editVertrag, setEditVertrag] = useState<Vertrag | null>(null)
   const [formOpen, setFormOpen] = useState(false)
@@ -172,18 +174,50 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
   return (
     <div>
       <div
-        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-2">
-          <h1 className="text-xl font-bold">Verträge</h1>
-          <button onClick={() => { setEditVertrag(null); setFormOpen(true) }}
-            className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
-            <Plus size={16} /> Vertrag
-          </button>
+          <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
+            {(['vertraege', 'termine'] as const).map(v => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  view === v
+                    ? 'bg-white dark:bg-[#3a3a3c] text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-[#8e8e93]'
+                }`}
+              >
+                {v === 'vertraege' ? 'Verträge' : 'Termine'}
+              </button>
+            ))}
+          </div>
+          {view === 'vertraege' ? (
+            <button onClick={() => { setEditVertrag(null); setFormOpen(true) }}
+              className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium">
+              <Plus size={16} /> Vertrag
+            </button>
+          ) : (
+            <button onClick={exportAll} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
+              <Download size={16} /> ICS
+            </button>
+          )}
         </div>
       </div>
-      <div className="px-4 pt-3 pb-8 space-y-5">
+
+      {view === 'termine' ? (
+        <TerminePage
+          embedded
+          positionen={positionen}
+          vertraege={vertraege}
+          sparplaene={sparplaene}
+          saveVertrag={saveVertrag}
+          removeVertrag={removeVertrag}
+          {...rest}
+        />
+      ) : (
+        <div className="px-4 pt-3 pb-8 space-y-5">
         {/* Sort */}
         <div className="flex gap-2 overflow-x-auto pb-1">
           {(['abbuchung', 'kuendigung', 'kategorie'] as SortBy[]).map(s => (
@@ -271,6 +305,7 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
         />
       </Sheet>
       </div>
+      )}
     </div>
   )
 }

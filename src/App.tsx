@@ -4,14 +4,15 @@ import type { Tab } from './components/BottomNav'
 import { DashboardPage } from './pages/DashboardPage'
 import { AnlagenPage } from './pages/AnlagenPage'
 import { VertraegePage } from './pages/VertraegePage'
-import { TerminePage } from './pages/TerminePage'
 import { BudgetPage } from './pages/BudgetPage'
-import { EinstellungenPage } from './pages/EinstellungenPage'
+import { MehrPage } from './pages/MehrPage'
 import { useAppData } from './hooks/useAppData'
 import { Sheet } from './components/Sheet'
 import { PositionForm } from './forms/PositionForm'
 import { VertragForm } from './forms/VertragForm'
 import { AusgabeForm } from './forms/AusgabeForm'
+import { EinnahmeForm } from './forms/EinnahmeForm'
+import { WiederkehrendeEinnahmeForm } from './forms/WiederkehrendeEinnahmeForm'
 
 export function App() {
   const [tab, setTab] = useState<Tab>('dashboard')
@@ -19,6 +20,8 @@ export function App() {
   const [positionFormOpen, setPositionFormOpen] = useState(false)
   const [vertragFormOpen, setVertragFormOpen] = useState(false)
   const [ausgabeFormOpen, setAusgabeFormOpen] = useState(false)
+  const [einnahmeFormOpen, setEinnahmeFormOpen] = useState(false)
+  const [weFormOpen, setWeFormOpen] = useState(false)
 
   const appData = useAppData()
 
@@ -49,19 +52,20 @@ export function App() {
         {tab === 'vertraege' && (
           <VertraegePage {...appData} hidden={hidden} />
         )}
-        {tab === 'termine' && (
-          <TerminePage {...appData} />
-        )}
         {tab === 'budget' && (
           <BudgetPage
             ausgaben={appData.ausgaben}
+            einnahmen={appData.einnahmen}
+            wiederkehrendeEinnahmen={appData.wiederkehrendeEinnahmen}
             vertraege={appData.vertraege}
             onAdd={() => setAusgabeFormOpen(true)}
             onRemove={id => void appData.removeAusgabe(id)}
+            onAddEinnahme={() => setEinnahmeFormOpen(true)}
+            onRemoveEinnahme={id => void appData.removeEinnahme(id)}
           />
         )}
-        {tab === 'einstellungen' && (
-          <EinstellungenPage
+        {tab === 'mehr' && (
+          <MehrPage
             {...appData}
             hidden={hidden}
             onToggleHidden={() => setHidden(h => !h)}
@@ -72,7 +76,7 @@ export function App() {
       {/* Bottom nav */}
       <BottomNav active={tab} onChange={setTab} />
 
-      {/* Global sheets (opened from Dashboard quick-add buttons) */}
+      {/* Global sheets */}
       <Sheet open={positionFormOpen} onClose={() => setPositionFormOpen(false)}
         title="Neue Position" fullscreen>
         <PositionForm
@@ -95,6 +99,22 @@ export function App() {
         <AusgabeForm
           onSave={a => { void appData.saveAusgabe(a); setAusgabeFormOpen(false) }}
           onCancel={() => setAusgabeFormOpen(false)}
+        />
+      </Sheet>
+
+      <Sheet open={einnahmeFormOpen} onClose={() => setEinnahmeFormOpen(false)}
+        title="Einnahme erfassen">
+        <EinnahmeForm
+          onSave={e => { void appData.saveEinnahme(e); setEinnahmeFormOpen(false) }}
+          onCancel={() => setEinnahmeFormOpen(false)}
+        />
+      </Sheet>
+
+      <Sheet open={weFormOpen} onClose={() => setWeFormOpen(false)}
+        title="Wiederkehrende Einnahme">
+        <WiederkehrendeEinnahmeForm
+          onSave={w => { void appData.saveWiederkehrendeEinnahme(w); setWeFormOpen(false) }}
+          onCancel={() => setWeFormOpen(false)}
         />
       </Sheet>
     </div>
