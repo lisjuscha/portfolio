@@ -150,41 +150,38 @@ export function BudgetPage({
       {/* Header */}
       <div className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-2">
-            <button onClick={vorMonat} className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 active:bg-gray-200 dark:active:bg-[#2c2c2e]">
-              <ChevronLeft size={20} />
-            </button>
-            <span className="text-base font-semibold w-36 text-center">
-              {MONATE[monat]} {jahr}
-            </span>
-            <button onClick={naechsterMonat} className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 active:bg-gray-200 dark:active:bg-[#2c2c2e]">
-              <ChevronRight size={20} />
-            </button>
+          <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
+            {(['ausgaben', 'einnahmen'] as const).map(v => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  view === v
+                    ? 'bg-white dark:bg-[#3a3a3c] text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-[#8e8e93]'
+                }`}
+              >
+                {v === 'ausgaben' ? 'Ausgaben' : 'Einnahmen'}
+              </button>
+            ))}
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
-              {(['ausgaben', 'einnahmen'] as const).map(v => (
-                <button
-                  key={v}
-                  onClick={() => setView(v)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    view === v
-                      ? 'bg-white dark:bg-[#3a3a3c] text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-500 dark:text-[#8e8e93]'
-                  }`}
-                >
-                  {v === 'ausgaben' ? 'Ausgaben' : 'Einnahmen'}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={view === 'ausgaben' ? onAdd : onAddEinnahme}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-sm font-medium"
-            >
-              <Plus size={16} />
-              {view === 'ausgaben' ? 'Ausgabe' : 'Einnahme'}
-            </button>
-          </div>
+          <button
+            onClick={view === 'ausgaben' ? onAdd : onAddEinnahme}
+            className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium"
+          >
+            <Plus size={16} /> {view === 'ausgaben' ? 'Ausgabe' : 'Einnahme'}
+          </button>
+        </div>
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <button onClick={vorMonat} className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 active:bg-gray-200 dark:active:bg-[#2c2c2e]">
+            <ChevronLeft size={18} />
+          </button>
+          <span className="text-sm font-semibold w-36 text-center">
+            {MONATE[monat]} {jahr}
+          </span>
+          <button onClick={naechsterMonat} className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 active:bg-gray-200 dark:active:bg-[#2c2c2e]">
+            <ChevronRight size={18} />
+          </button>
         </div>
       </div>
 

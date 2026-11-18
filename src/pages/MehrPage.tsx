@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Plus, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Settings } from 'lucide-react'
 import type { AppData } from '../hooks/useAppData'
 import type { Sparziel, Schuld, AktieETFPosition, ZinsPosition } from '../types'
 import { sparzielFortschritt, positionCurrentValue, erwarteterZinsertrag } from '../utils/calc'
@@ -355,7 +355,11 @@ export function MehrPage({
         </Sektion>
 
         {/* ─── 5. Einstellungen ──────────────────────────────────────────── */}
-        <Sektion title="Einstellungen" defaultOpen={false}>
+        <div className="border-t-2 border-gray-200 dark:border-[#38383a] pt-6">
+          <div className="flex items-center gap-2 px-1 mb-4">
+            <Settings size={16} className="text-gray-500 dark:text-[#8e8e93]" />
+            <span className="text-xs font-semibold text-gray-500 dark:text-[#8e8e93] uppercase tracking-wide">Einstellungen</span>
+          </div>
           <EinstellungenPage
             embedded
             hidden={hidden}
@@ -372,7 +376,7 @@ export function MehrPage({
             removeSchuld={removeSchuld}
             {...rest}
           />
-        </Sektion>
+        </div>
       </div>
 
       {/* Sheets */}
