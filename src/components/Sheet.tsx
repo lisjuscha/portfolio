@@ -29,7 +29,7 @@ export function Sheet({ open, onClose, title, children, fullscreen = false }: Pr
     >
       <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
       <div
-        className={`relative bg-white dark:bg-[#1c1c1e] rounded-t-2xl flex flex-col ${
+        className={`relative bg-white dark:bg-[#2d1c16] rounded-t-2xl flex flex-col ${
           fullscreen ? `flex-1` : 'max-h-[92dvh]'
         }`}
         style={{
@@ -45,7 +45,7 @@ export function Sheet({ open, onClose, title, children, fullscreen = false }: Pr
         )}
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#38383a]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#4f3220]">
             <h2 className="text-base font-semibold">{title}</h2>
             <button
               onClick={onClose}

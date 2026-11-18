@@ -46,7 +46,7 @@ export function VertragForm({ initial, onSave, onCancel }: Props) {
     })
   }
 
-  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm"
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#4f3220] bg-white dark:bg-[#3d2718] text-sm"
   const labelCls = "block text-sm font-medium mb-1"
 
   return (
@@ -67,7 +67,7 @@ export function VertragForm({ initial, onSave, onCancel }: Props) {
         <div className="flex flex-wrap gap-2">
           {KATEGORIEN.map(k => (
             <button key={k} type="button" onClick={() => setKategorie(k)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${kategorie === k ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${kategorie === k ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#4f3220] text-gray-600 dark:text-gray-400'}`}>
               {k}
             </button>
           ))}
@@ -136,7 +136,7 @@ export function VertragForm({ initial, onSave, onCancel }: Props) {
         <div className="flex gap-2">
           {(['aktiv', 'gekündigt'] as VertragStatus[]).map(s => (
             <button key={s} type="button" onClick={() => setStatus(s)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${status === s ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${status === s ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#4f3220] text-gray-600 dark:text-gray-400'}`}>
               {s}
             </button>
           ))}
@@ -144,7 +144,7 @@ export function VertragForm({ initial, onSave, onCancel }: Props) {
       </div>
 
       <div className="flex gap-3 pt-2">
-        <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-[#38383a] text-sm font-medium">Abbrechen</button>
+        <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-[#4f3220] text-sm font-medium">Abbrechen</button>
         <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-medium">Speichern</button>
       </div>
     </form>

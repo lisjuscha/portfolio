@@ -25,7 +25,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
   const fileRef = useRef<HTMLInputElement>(null)
   const lastBackup = localStorage.getItem('lastBackup')
 
-  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm"
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#4f3220] bg-white dark:bg-[#3d2718] text-sm"
 
   function saveApiKey() {
     if (apiKey.trim()) {
@@ -113,7 +113,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
       <div className="px-4 pt-4 pb-8 space-y-5">
 
       {/* Hide amounts */}
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">Beträge verbergen</p>
           <p className="text-xs text-gray-400 mt-0.5">Alle Beträge in der App maskieren</p>
@@ -125,7 +125,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
       </div>
 
       {/* API Key */}
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm space-y-3">
+      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-2">
           <Key size={16} className="text-blue-600" />
           <h2 className="text-sm font-semibold">Kurse: Twelve Data API-Key</h2>
@@ -152,8 +152,8 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
       </div>
 
       {/* Konten */}
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#38383a]">
+      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#4f3220]">
           <div className="flex items-center gap-2">
             <Building2 size={16} className="text-blue-600" />
             <h2 className="text-sm font-semibold">Konten &amp; Depots</h2>
@@ -167,7 +167,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
           <div className="px-4 py-3 text-sm text-gray-400">Noch keine Konten.</div>
         ) : (
           konten.map((k, i) => (
-            <div key={k.id} className={`flex items-center gap-3 px-4 py-3 ${i < konten.length - 1 ? 'border-b border-gray-100 dark:border-[#38383a]' : ''}`}>
+            <div key={k.id} className={`flex items-center gap-3 px-4 py-3 ${i < konten.length - 1 ? 'border-b border-gray-100 dark:border-[#4f3220]' : ''}`}>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">{k.name}</p>
                 <p className="text-xs text-gray-400">{k.typ}</p>
@@ -184,7 +184,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
       </div>
 
       {/* Backup Export */}
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm space-y-3">
+      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-2">
           <Download size={16} className="text-blue-600" />
           <h2 className="text-sm font-semibold">Backup exportieren</h2>
@@ -210,13 +210,13 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
       </div>
 
       {/* Backup Import */}
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm space-y-3">
+      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm space-y-3">
         <div className="flex items-center gap-2">
           <Upload size={16} className="text-blue-600" />
           <h2 className="text-sm font-semibold">Backup importieren</h2>
         </div>
         <button onClick={() => fileRef.current?.click()}
-          className="w-full py-2.5 border-2 border-dashed border-gray-200 dark:border-[#38383a] rounded-xl text-sm text-gray-400">
+          className="w-full py-2.5 border-2 border-dashed border-gray-200 dark:border-[#4f3220] rounded-xl text-sm text-gray-400">
           {pendingImport ? '✓ Datei geladen' : 'Backup-Datei auswählen'}
         </button>
         <input ref={fileRef} type="file" accept=".json,.enc" onChange={e => void handleFileSelected(e)} className="hidden" />
@@ -230,7 +230,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
               placeholder="Backup-Passwort"
               required
             />
-            <button type="submit" className="px-4 py-2 border border-gray-200 dark:border-[#38383a] rounded-xl text-sm font-medium shrink-0">
+            <button type="submit" className="px-4 py-2 border border-gray-200 dark:border-[#4f3220] rounded-xl text-sm font-medium shrink-0">
               Prüfen
             </button>
           </form>
@@ -240,7 +240,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
             <p className="text-xs text-green-800 dark:text-green-300 mb-2">Vorschau: {importPreview}</p>
             <div className="flex gap-2">
               <button onClick={() => { setPendingImport(null); setImportPreview(null); setImportPass('') }}
-                className="flex-1 py-2 border border-gray-200 dark:border-[#38383a] rounded-xl text-sm font-medium">
+                className="flex-1 py-2 border border-gray-200 dark:border-[#4f3220] rounded-xl text-sm font-medium">
                 Abbrechen
               </button>
               <button onClick={() => void confirmImport()}
@@ -261,7 +261,7 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
       )}
 
       {/* Info */}
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm space-y-2">
+      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm space-y-2">
         <h2 className="text-sm font-semibold">Datenschutz</h2>
         <p className="text-xs text-gray-400 leading-relaxed">
           Alle Daten liegen ausschließlich lokal auf diesem Gerät. Kein Server, keine Accounts, keine Analytik. Backups sind AES-GCM 256-bit verschlüsselt und können nur mit dem gewählten Passwort wiederhergestellt werden.

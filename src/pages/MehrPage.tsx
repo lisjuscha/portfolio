@@ -14,10 +14,10 @@ interface Props extends AppData {
   onToggleHidden: () => void
 }
 
-function ProgressBar({ value, max, color = '#007aff' }: { value: number; max: number; color?: string }) {
+function ProgressBar({ value, max, color = '#4D0E12' }: { value: number; max: number; color?: string }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0
   return (
-    <div className="h-2 bg-gray-100 dark:bg-[#38383a] rounded-full overflow-hidden">
+    <div className="h-2 bg-gray-100 dark:bg-[#4f3220] rounded-full overflow-hidden">
       <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
     </div>
   )
@@ -139,7 +139,7 @@ export function MehrPage({
     <div>
       {/* Header */}
       <div
-        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]"
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#4f3220]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <h1 className="text-xl font-bold pt-2">Mehr</h1>
@@ -151,14 +151,14 @@ export function MehrPage({
         <Sektion title="Sparziele">
           <div className="space-y-3">
             {sparziele.length === 0 ? (
-              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 text-center text-sm text-gray-400">
+              <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 text-center text-sm text-gray-400">
                 Noch keine Sparziele.
               </div>
             ) : (
               sparziele.map(z => {
                 const fp = sparzielFortschritt(z, positionen, konten, fxRates)
                 return (
-                  <div key={z.id} className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 space-y-2">
+                  <div key={z.id} className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="text-sm font-semibold">{z.name}</div>
@@ -193,7 +193,7 @@ export function MehrPage({
             )}
             <button
               onClick={() => { setEditSparziel(null); setSparzielFormOpen(true) }}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-gray-200 dark:border-[#38383a] text-sm text-blue-600 dark:text-blue-400 font-medium"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-gray-200 dark:border-[#4f3220] text-sm text-blue-600 dark:text-blue-400 font-medium"
             >
               <Plus size={16} /> Sparziel hinzufügen
             </button>
@@ -204,20 +204,20 @@ export function MehrPage({
         <Sektion title="Schulden & Verbindlichkeiten">
           <div className="space-y-3">
             {schulden.length > 0 && (
-              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl px-4 py-3 flex items-center justify-between">
+              <div className="bg-white dark:bg-[#2d1c16] rounded-2xl px-4 py-3 flex items-center justify-between">
                 <div className="text-xs text-gray-500 dark:text-[#8e8e93] font-medium">Gesamtschulden</div>
                 <div className="text-lg font-bold text-red-600 dark:text-red-400">{hidden ? '••••' : formatEuro(schuldenGesamt)}</div>
               </div>
             )}
             {schulden.length === 0 ? (
-              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 text-center text-sm text-gray-400">
+              <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 text-center text-sm text-gray-400">
                 Keine Verbindlichkeiten.
               </div>
             ) : (
               schulden.map(s => {
                 const restMonate = s.monatlicheRate > 0 ? Math.ceil(s.restbetrag / s.monatlicheRate) : null
                 return (
-                  <div key={s.id} className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 space-y-2">
+                  <div key={s.id} className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="text-sm font-semibold">{s.name}</div>
@@ -257,7 +257,7 @@ export function MehrPage({
             )}
             <button
               onClick={() => { setEditSchuld(null); setSchuldFormOpen(true) }}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-gray-200 dark:border-[#38383a] text-sm text-red-600 dark:text-red-400 font-medium"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-gray-200 dark:border-[#4f3220] text-sm text-red-600 dark:text-red-400 font-medium"
             >
               <Plus size={16} /> Schuld hinzufügen
             </button>
@@ -266,7 +266,7 @@ export function MehrPage({
 
         {/* ─── 3. Notfallrücklage ────────────────────────────────────────── */}
         <Sektion title="Notfallrücklage">
-          <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 space-y-4">
+          <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-xs text-gray-500 dark:text-[#8e8e93] font-medium">Tagesgeld-Guthaben</div>
@@ -304,7 +304,7 @@ export function MehrPage({
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                       notfallMonate === m
                         ? 'bg-orange-500 text-white border-orange-500'
-                        : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'
+                        : 'border-gray-200 dark:border-[#4f3220] text-gray-600 dark:text-gray-400'
                     }`}
                   >
                     {m}M
@@ -320,7 +320,7 @@ export function MehrPage({
 
         {/* ─── 4. Freistellungsauftrag ───────────────────────────────────── */}
         <Sektion title="Freistellungsauftrag">
-          <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 space-y-4">
+          <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Zusammenveranlagung</span>
               <button
@@ -355,7 +355,7 @@ export function MehrPage({
         </Sektion>
 
         {/* ─── 5. Einstellungen ──────────────────────────────────────────── */}
-        <div className="border-t-2 border-gray-200 dark:border-[#38383a] pt-6">
+        <div className="border-t-2 border-gray-200 dark:border-[#4f3220] pt-6">
           <div className="flex items-center gap-2 px-1 mb-4">
             <Settings size={16} className="text-gray-500 dark:text-[#8e8e93]" />
             <span className="text-xs font-semibold text-gray-500 dark:text-[#8e8e93] uppercase tracking-wide">Einstellungen</span>

@@ -163,23 +163,23 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
     if (confirm(`"${p.name}" wirklich löschen?`)) void removePosition(p.id)
   }
 
-  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm"
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#4f3220] bg-white dark:bg-[#3d2718] text-sm"
 
   return (
     <div>
       <div
-        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]"
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#4f3220]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-2">
-          <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
+          <div className="flex gap-1 bg-gray-100 dark:bg-[#3d2718] rounded-xl p-1">
             {(['liste', 'rebalancing', 'ertraege'] as AnlagenView[]).map(v => (
               <button
                 key={v}
                 onClick={() => setView(v)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   view === v
-                    ? 'bg-white dark:bg-[#3a3a3c] text-gray-900 dark:text-white shadow-sm'
+                    ? 'bg-white dark:bg-[#4f3220] text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-500 dark:text-[#8e8e93]'
                 }`}
               >
@@ -202,7 +202,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
         <div className="flex gap-2">
           {(['konto', 'klasse'] as GroupBy[]).map(g => (
             <button key={g} onClick={() => setGroupBy(g)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${groupBy === g ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${groupBy === g ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#4f3220] text-gray-600 dark:text-gray-400'}`}>
               {g === 'konto' ? <Building2 size={14} /> : <LayoutList size={14} />}
               {g === 'konto' ? 'nach Konto' : 'nach Klasse'}
             </button>
@@ -219,8 +219,8 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
         </div>
       ) : (
         groups.map(group => (
-          <div key={group.label} className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100 dark:border-[#38383a] flex items-center justify-between">
+          <div key={group.label} className="bg-white dark:bg-[#2d1c16] rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-[#4f3220] flex items-center justify-between">
               <h2 className="text-sm font-semibold">{group.label}</h2>
               <span className="text-xs text-gray-400 tabular-nums">
                 {hidden ? '••••' : formatEuro(group.positionen.reduce((s, p) => s + positionCurrentValue(p, fxRates), 0))}
@@ -259,7 +259,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
                   </button>
                   {/* Expanded actions */}
                   {detailPosition?.id === pos.id && (
-                    <div className="bg-gray-50 dark:bg-[#2c2c2e] border-t border-gray-100 dark:border-[#38383a] px-4 py-3 flex flex-wrap gap-2">
+                    <div className="bg-gray-50 dark:bg-[#3d2718] border-t border-gray-100 dark:border-[#4f3220] px-4 py-3 flex flex-wrap gap-2">
                       {isAktieETF && (
                         <button onClick={() => openKaufForPosition(pos)}
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-medium">
@@ -267,11 +267,11 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
                         </button>
                       )}
                       <button onClick={() => { setEditPosition(pos); setSparplanFormOpen(true) }}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#48484a] text-xs font-medium">
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#5c3a28] text-xs font-medium">
                         Sparplan
                       </button>
                       <button onClick={() => { setEditPosition(pos); setPositionFormOpen(true) }}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#48484a] text-xs font-medium">
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#5c3a28] text-xs font-medium">
                         <Pencil size={12} /> Bearbeiten
                       </button>
                       <button onClick={() => confirmDelete(pos)}
@@ -280,7 +280,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
                       </button>
                     </div>
                   )}
-                  {i < group.positionen.length - 1 && <div className="mx-4 h-px bg-gray-100 dark:bg-[#38383a]" />}
+                  {i < group.positionen.length - 1 && <div className="mx-4 h-px bg-gray-100 dark:bg-[#4f3220]" />}
                 </div>
               )
             })}
@@ -290,8 +290,8 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
 
       {/* Fälligkeiten */}
       {faelligkeiten.length > 0 && (
-        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 dark:border-[#38383a]">
+        <div className="bg-white dark:bg-[#2d1c16] rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-[#4f3220]">
             <h2 className="text-sm font-semibold">Fälligkeiten</h2>
           </div>
           {faelligkeiten.map((pos, i) => {
@@ -312,7 +312,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
                     <p className="text-sm tabular-nums text-green-600 dark:text-green-400">+{hidden ? '••' : formatEuro(zins)}</p>
                   </div>
                 </div>
-                {i < faelligkeiten.length - 1 && <div className="mx-4 h-px bg-gray-100 dark:bg-[#38383a]" />}
+                {i < faelligkeiten.length - 1 && <div className="mx-4 h-px bg-gray-100 dark:bg-[#4f3220]" />}
               </div>
             )
           })}
@@ -320,7 +320,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
       )}
 
       {/* Sparziele */}
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold">Sparziele</h2>
           <button onClick={() => { setEditSparziel(null); setSparzielFormOpen(true) }}
@@ -367,7 +367,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
 
       {/* Total */}
       {positionen.length > 0 && (
-        <div className="flex justify-between items-center px-2 pt-2 border-t border-gray-200 dark:border-[#38383a]">
+        <div className="flex justify-between items-center px-2 pt-2 border-t border-gray-200 dark:border-[#4f3220]">
           <span className="text-sm font-medium">Gesamtwert</span>
           <span className="text-lg font-bold tabular-nums">{hidden ? '••••' : formatEuro(gesamtwert)}</span>
         </div>
@@ -420,7 +420,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
             <input className={inputCls} type="date" value={kaufDatum} onChange={e => setKaufDatum(e.target.value)} required />
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setKaufOpen(false)} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-[#38383a] text-sm font-medium">Abbrechen</button>
+            <button type="button" onClick={() => setKaufOpen(false)} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-[#4f3220] text-sm font-medium">Abbrechen</button>
             <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-medium">Speichern</button>
           </div>
         </form>
@@ -433,7 +433,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
           <div className="text-center py-12 text-gray-400 text-sm">Noch keine Positionen für Rebalancing.</div>
         ) : (
           <>
-            <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
+            <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm">
               <p className="text-xs text-gray-400 mb-3">Zielallokation in % pro Anlageklasse eingeben. Delta zeigt, wie viel gekauft (+) oder verkauft (−) werden soll.</p>
               <div className="space-y-3">
                 {rebalancingRows.map(row => {
@@ -454,7 +454,7 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
                             value={zielAllokation[row.klasse] ?? ''}
                             onChange={e => setZiel(row.klasse, e.target.value)}
                             placeholder="0"
-                            className="w-16 px-2 py-1 text-sm text-right rounded-lg border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e]"
+                            className="w-16 px-2 py-1 text-sm text-right rounded-lg border border-gray-200 dark:border-[#4f3220] bg-white dark:bg-[#3d2718]"
                           />
                           <span className="text-xs text-gray-400 w-4">%</span>
                         </div>
@@ -495,15 +495,15 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
             {ertragskalender.map(m => {
               const monatsTotal = m.eintraege.reduce((s, e) => s + e.betrag, 0)
               return (
-                <div key={`${m.jahr}-${m.monat}`} className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#38383a]">
+                <div key={`${m.jahr}-${m.monat}`} className="bg-white dark:bg-[#2d1c16] rounded-2xl shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#4f3220]">
                     <span className="text-sm font-semibold">{m.label}</span>
                     <span className="text-sm font-bold tabular-nums text-green-600 dark:text-green-400">
                       {hidden ? '••••' : `+${formatEuro(monatsTotal)}`}
                     </span>
                   </div>
                   {m.eintraege.map((e, i) => (
-                    <div key={i} className="flex items-center justify-between px-4 py-2.5 border-b border-gray-50 dark:border-[#2c2c2e] last:border-0">
+                    <div key={i} className="flex items-center justify-between px-4 py-2.5 border-b border-gray-50 dark:border-[#3d2718] last:border-0">
                       <div>
                         <span className="text-sm">{e.name}</span>
                         <span className={`ml-2 text-xs px-1.5 py-0.5 rounded font-medium ${

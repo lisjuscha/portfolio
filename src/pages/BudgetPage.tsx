@@ -148,16 +148,16 @@ export function BudgetPage({
   return (
     <div>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#4f3220]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex items-center justify-between pt-2">
-          <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
+          <div className="flex gap-1 bg-gray-100 dark:bg-[#3d2718] rounded-xl p-1">
             {(['ausgaben', 'einnahmen'] as const).map(v => (
               <button
                 key={v}
                 onClick={() => setView(v)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   view === v
-                    ? 'bg-white dark:bg-[#3a3a3c] text-gray-900 dark:text-white shadow-sm'
+                    ? 'bg-white dark:bg-[#4f3220] text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-500 dark:text-[#8e8e93]'
                 }`}
               >
@@ -204,7 +204,7 @@ export function BudgetPage({
           )}
 
           {/* Monthly totals */}
-          <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+          <div className="bg-white dark:bg-[#2d1c16] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
             <div className="flex items-center justify-between px-4 py-3">
               <div>
                 <div className="text-xs text-gray-500 dark:text-[#8e8e93] font-medium">Variable Ausgaben</div>
@@ -231,7 +231,7 @@ export function BudgetPage({
 
           {/* Donut chart */}
           {donutSegments.length > 0 && (
-            <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4">
+            <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4">
               <div className="text-sm font-semibold mb-3">Nach Kategorie</div>
               <div className="flex items-center gap-4">
                 <DonutChart segments={donutSegments} size={120} strokeWidth={26} />
@@ -254,7 +254,7 @@ export function BudgetPage({
               <div className="text-xs font-semibold text-gray-500 dark:text-[#8e8e93] uppercase tracking-wide mb-2 px-1">
                 Fixkosten diesen Monat
               </div>
-              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+              <div className="bg-white dark:bg-[#2d1c16] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
                 {monatVertraege.map(v => (
                   <div key={v.id} className="flex items-center px-4 py-3 gap-3">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: VERTRAG_FARBE + '22' }}>
@@ -293,7 +293,7 @@ export function BudgetPage({
                   <div className="text-xs text-gray-400 dark:text-[#8e8e93] mb-1.5 px-1">
                     {formatDatumLang(day)}
                   </div>
-                  <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+                  <div className="bg-white dark:bg-[#2d1c16] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
                     {eintraege.map(a => (
                       <div key={a.id} className="flex items-center px-4 py-3 gap-3">
                         <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: AUSGABEN_FARBEN[a.kategorie] + '22' }}>
@@ -306,7 +306,7 @@ export function BudgetPage({
                           )}
                         </div>
                         <div className="text-sm font-semibold tabular-nums shrink-0">{formatEuro(a.betrag)}</div>
-                        <button onClick={() => onRemove(a.id)} className="p-1 text-gray-300 dark:text-[#48484a] active:text-red-500 shrink-0">
+                        <button onClick={() => onRemove(a.id)} className="p-1 text-gray-300 dark:text-[#5c3a28] active:text-red-500 shrink-0">
                           <Trash2 size={15} />
                         </button>
                       </div>
@@ -321,7 +321,7 @@ export function BudgetPage({
         /* Einnahmen-View */
         <div className="px-4 pt-4 space-y-4 pb-8">
           {/* Summary */}
-          <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+          <div className="bg-white dark:bg-[#2d1c16] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
             {weGesamt > 0 && (
               <div className="flex items-center justify-between px-4 py-3">
                 <div>
@@ -354,7 +354,7 @@ export function BudgetPage({
               <div className="text-xs font-semibold text-gray-500 dark:text-[#8e8e93] uppercase tracking-wide mb-2 px-1">
                 Fixeinnahmen
               </div>
-              <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+              <div className="bg-white dark:bg-[#2d1c16] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
                 {aktiveWE.map(w => {
                   const color = EINNAHME_FARBEN[w.kategorie]
                   return (
@@ -385,7 +385,7 @@ export function BudgetPage({
                   <div className="text-xs text-gray-400 dark:text-[#8e8e93] mb-1.5 px-1">
                     {formatDatumLang(day)}
                   </div>
-                  <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
+                  <div className="bg-white dark:bg-[#2d1c16] rounded-2xl divide-y divide-gray-100 dark:divide-[#38383a]">
                     {eintraege.map(e => {
                       const color = EINNAHME_FARBEN[e.kategorie]
                       return (
@@ -400,7 +400,7 @@ export function BudgetPage({
                             )}
                           </div>
                           <div className="text-sm font-semibold tabular-nums shrink-0 text-green-600 dark:text-green-400">+{formatEuro(e.betrag)}</div>
-                          <button onClick={() => onRemoveEinnahme(e.id)} className="p-1 text-gray-300 dark:text-[#48484a] active:text-red-500 shrink-0">
+                          <button onClick={() => onRemoveEinnahme(e.id)} className="p-1 text-gray-300 dark:text-[#5c3a28] active:text-red-500 shrink-0">
                             <Trash2 size={15} />
                           </button>
                         </div>
