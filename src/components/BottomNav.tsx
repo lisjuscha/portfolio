@@ -17,7 +17,7 @@ interface Props {
 
 export function BottomNav({ active, onChange }: Props) {
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-10 bg-white dark:bg-black border-t border-gray-200 dark:border-[#4f3220]">
+    <nav className="fixed bottom-0 inset-x-0 z-10 bg-white dark:bg-black border-t border-gray-200 dark:border-[#38383a]">
       <div className="flex">
         {TABS.map(tab => {
           const Icon = tab.icon

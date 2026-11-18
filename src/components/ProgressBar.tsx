@@ -18,7 +18,7 @@ export function ProgressBar({ value, max, color = '#2563eb', label, sublabel, hi
           {sublabel && <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{hidden ? '••••' : sublabel}</span>}
         </div>
       )}
-      <div className="h-2 bg-gray-200 dark:bg-[#3d2718] rounded-full overflow-hidden">
+      <div className="h-2 bg-gray-200 dark:bg-[#2c2c2e] rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${pct}%`, backgroundColor: color }}

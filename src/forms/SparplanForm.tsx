@@ -30,7 +30,7 @@ export function SparplanForm({ positionId, initial, onSave, onCancel }: Props) {
     })
   }
 
-  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#4f3220] bg-white dark:bg-[#3d2718] text-sm"
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm"
   const labelCls = "block text-sm font-medium mb-1"
 
   return (
@@ -50,7 +50,7 @@ export function SparplanForm({ positionId, initial, onSave, onCancel }: Props) {
         <div className="flex gap-2">
           {INTERVALLE.map(i => (
             <button key={i} type="button" onClick={() => setIntervall(i)}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${intervall === i ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#4f3220] text-gray-600 dark:text-gray-400'}`}>
+              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${intervall === i ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
               {i}
             </button>
           ))}
@@ -67,7 +67,7 @@ export function SparplanForm({ positionId, initial, onSave, onCancel }: Props) {
         </div>
       </div>
       <div className="flex gap-3 pt-2">
-        <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-[#4f3220] text-sm font-medium">Abbrechen</button>
+        <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-[#38383a] text-sm font-medium">Abbrechen</button>
         <button type="submit" className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-medium">Speichern</button>
       </div>
     </form>

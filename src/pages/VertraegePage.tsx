@@ -120,7 +120,7 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
     const color = KATEGORIE_COLORS[v.kategorie] ?? '#6b7280'
 
     return (
-      <div key={v.id} className="border-b border-gray-100 dark:border-[#4f3220] last:border-0">
+      <div key={v.id} className="border-b border-gray-100 dark:border-[#38383a] last:border-0">
         <div className="px-4 py-3">
           <div className="flex items-start gap-3">
             <div className="w-2.5 h-2.5 rounded-full mt-1 shrink-0" style={{ backgroundColor: color }} />
@@ -143,7 +143,7 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
                   <span className={urgent ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-500'}>
                     Kündigung bis: <span className="tabular-nums">{formatDate(kuendigungsDeadline.toISOString())}</span>
                     {daysToKuendigung !== null && daysToKuendigung <= 60 && (
-                      <span className={`ml-1 px-1.5 py-0.5 rounded ${urgent ? 'bg-red-100 dark:bg-red-900/40' : 'bg-gray-100 dark:bg-[#3d2718]'}`}>
+                      <span className={`ml-1 px-1.5 py-0.5 rounded ${urgent ? 'bg-red-100 dark:bg-red-900/40' : 'bg-gray-100 dark:bg-[#2c2c2e]'}`}>
                         {daysToKuendigung}d
                       </span>
                     )}
@@ -152,11 +152,11 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
               </div>
               <div className="mt-2 flex gap-2">
                 <button onClick={() => exportSingle(v)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-[#4f3220] text-xs font-medium">
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-[#38383a] text-xs font-medium">
                   <Calendar size={12} /> Kalender
                 </button>
                 <button onClick={() => { setEditVertrag(v); setFormOpen(true) }}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-[#4f3220] text-xs font-medium">
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-[#38383a] text-xs font-medium">
                   <Pencil size={12} /> Bearbeiten
                 </button>
                 <button onClick={() => { if (confirm(`"${v.name}" löschen?`)) void removeVertrag(v.id) }}
@@ -174,18 +174,18 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
   return (
     <div>
       <div
-        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#4f3220]"
+        className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-2">
-          <div className="flex gap-1 bg-gray-100 dark:bg-[#3d2718] rounded-xl p-1">
+          <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
             {(['vertraege', 'termine'] as const).map(v => (
               <button
                 key={v}
                 onClick={() => setView(v)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   view === v
-                    ? 'bg-white dark:bg-[#4f3220] text-gray-900 dark:text-white shadow-sm'
+                    ? 'bg-white dark:bg-[#38383a] text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-500 dark:text-[#8e8e93]'
                 }`}
               >
@@ -222,14 +222,14 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
         <div className="flex gap-2 overflow-x-auto pb-1">
           {(['abbuchung', 'kuendigung', 'kategorie'] as SortBy[]).map(s => (
             <button key={s} onClick={() => setSortBy(s)}
-              className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${sortBy === s ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#4f3220] text-gray-600 dark:text-gray-400'}`}>
+              className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${sortBy === s ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'}`}>
               {s === 'abbuchung' ? 'Abbuchung' : s === 'kuendigung' ? 'Kündigung' : 'Kategorie'}
             </button>
           ))}
         </div>
 
       {/* Summary */}
-      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm flex items-center justify-between">
         <div>
           <p className="text-xs text-gray-400 mb-0.5">Monatlich</p>
           <p className="text-2xl font-bold tabular-nums">{hidden ? '••••' : formatEuro(fixkostenMonat)}</p>
@@ -245,7 +245,7 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
 
       {/* Active contracts */}
       {aktiveVertraege.length > 0 && (
-        <div className="bg-white dark:bg-[#2d1c16] rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden">
           {aktiveVertraege.map(v => renderVertrag(v))}
         </div>
       )}
@@ -260,15 +260,15 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
       )}
 
       {/* Monthly overview */}
-      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl shadow-sm overflow-hidden">
-        <button onClick={() => setMonatDetail(v => !v)} className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#4f3220]">
+      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden">
+        <button onClick={() => setMonatDetail(v => !v)} className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#38383a]">
           <h2 className="text-sm font-semibold">Monatsübersicht (12 Monate)</h2>
           <span className="text-xs text-blue-600">{monatDetail ? 'Weniger' : 'Details'}</span>
         </button>
         {monatDetail && (
           <div>
             {monateUebersicht.map((m, i) => (
-              <div key={i} className="border-b border-gray-100 dark:border-[#4f3220] last:border-0">
+              <div key={i} className="border-b border-gray-100 dark:border-[#38383a] last:border-0">
                 <div className="px-4 py-3 flex items-center justify-between">
                   <span className="text-sm font-medium">{m.label}</span>
                   <span className="text-sm tabular-nums font-semibold">{hidden ? '••••' : formatEuro(m.summe)}</span>
@@ -287,8 +287,8 @@ export function VertraegePage({ hidden, vertraege, positionen, sparplaene, saveV
 
       {/* Cancelled */}
       {gekundigte.length > 0 && (
-        <div className="bg-white dark:bg-[#2d1c16] rounded-2xl shadow-sm overflow-hidden opacity-60">
-          <div className="px-4 py-3 border-b border-gray-100 dark:border-[#4f3220]">
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-sm overflow-hidden opacity-60">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-[#38383a]">
             <h2 className="text-sm font-semibold text-gray-400">Gekündigt</h2>
           </div>
           {gekundigte.map(v => renderVertrag(v))}

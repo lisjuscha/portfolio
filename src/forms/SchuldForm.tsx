@@ -39,7 +39,7 @@ export function SchuldForm({ initial, onSave, onCancel }: Props) {
     })
   }
 
-  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#4f3220] bg-white dark:bg-[#3d2718] text-sm"
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-[#38383a] bg-white dark:bg-[#2c2c2e] text-sm"
   const labelCls = "block text-sm font-medium mb-1"
 
   return (
@@ -79,7 +79,7 @@ export function SchuldForm({ initial, onSave, onCancel }: Props) {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                 kategorie === k
                   ? 'bg-red-600 text-white border-red-600'
-                  : 'border-gray-200 dark:border-[#4f3220] text-gray-600 dark:text-gray-400'
+                  : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'
               }`}
             >
               {k}
@@ -158,7 +158,7 @@ export function SchuldForm({ initial, onSave, onCancel }: Props) {
 
       <div className="flex gap-3 pt-2">
         <button type="button" onClick={onCancel}
-          className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-[#4f3220] text-sm font-medium">
+          className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-[#38383a] text-sm font-medium">
           Abbrechen
         </button>
         <button type="submit"

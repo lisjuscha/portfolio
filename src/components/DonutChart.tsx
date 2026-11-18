@@ -35,7 +35,7 @@ export function DonutChart({ segments, size = 180, strokeWidth = 32, hidden = fa
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-gray-200 dark:text-[#3d2718]"
+          className="text-gray-200 dark:text-[#2c2c2e]"
         />
         {hidden && (
           <text x={size / 2} y={size / 2 + 6} textAnchor="middle" fontSize={size * 0.12} fill="currentColor" className="fill-gray-400 dark:fill-gray-500">
@@ -67,7 +67,7 @@ export function DonutChart({ segments, size = 180, strokeWidth = 32, hidden = fa
         fill="none"
         stroke="currentColor"
         strokeWidth={strokeWidth}
-        className="text-gray-100 dark:text-[#3d2718]"
+        className="text-gray-100 dark:text-[#2c2c2e]"
       />
       {arcs.map((arc, i) => (
         <circle

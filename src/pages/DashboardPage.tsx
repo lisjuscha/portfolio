@@ -167,13 +167,13 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
       <div className="px-4 pt-2 space-y-5 pb-8">
 
       {/* Gesamtwert */}
-      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-5 shadow-sm">
+      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-5 shadow-sm">
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Gesamtvermögen</p>
         <p className="text-4xl font-bold tabular-nums tracking-tight">
           {formatEuro(gesamtwert, hidden)}
         </p>
         {schuldenGesamt > 0 && (
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-[#4f3220]">
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-[#38383a]">
             <span className="text-xs text-gray-400">Nettovermögen (nach Schulden)</span>
             <span className={`text-sm font-semibold tabular-nums ${nettovermoegen >= 0 ? 'text-gray-800 dark:text-gray-200' : 'text-red-500'}`}>
               {hidden ? '••••' : formatEuro(nettovermoegen)}
@@ -192,7 +192,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
 
       {/* Monatsbilanz-Mini */}
       {monatsbilanz && (
-        <div className={`bg-white dark:bg-[#2d1c16] rounded-2xl px-4 py-3 shadow-sm ${monatsbilanz.bilanz >= 0 ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'}`}>
+        <div className={`bg-white dark:bg-[#1c1c1e] rounded-2xl px-4 py-3 shadow-sm ${monatsbilanz.bilanz >= 0 ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'}`}>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-400 mb-0.5">Monatsbilanz</p>
@@ -212,7 +212,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
 
       {/* Notfallrücklage-Mini */}
       {notfallMini && notfallMini.ziel > 0 && (
-        <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm space-y-2">
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold">Notfallrücklage</p>
             <p className="text-xs text-gray-400">{notfallMini.zielMonate} Monate Ziel</p>
@@ -228,12 +228,12 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
 
       {/* Freistellungsauftrag-Mini */}
       {freistellungMini && (
-        <div className="bg-white dark:bg-[#2d1c16] rounded-2xl px-4 py-3 shadow-sm">
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl px-4 py-3 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-semibold">Freistellungsauftrag</p>
             <p className="text-xs text-gray-400">{hidden ? '••••' : formatEuro(freistellungMini.ertraege)} / {formatEuro(freistellungMini.limit)}</p>
           </div>
-          <div className="h-2 bg-gray-100 dark:bg-[#4f3220] rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-100 dark:bg-[#38383a] rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -246,7 +246,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
       )}
 
       {/* Verlauf */}
-      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold">Verlauf</h2>
           <div className="flex gap-1">
@@ -263,7 +263,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
 
       {/* Verteilung */}
       {donutSegments.length > 0 && (
-        <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm">
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
           <h2 className="text-sm font-semibold mb-3">Verteilung</h2>
           <div className="flex items-center gap-4">
             <DonutChart segments={donutSegments} size={130} strokeWidth={28} hidden={hidden} />
@@ -284,7 +284,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
 
       {/* Sparziele */}
       {zielFortschritte.length > 0 && (
-        <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm">
+        <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
           <h2 className="text-sm font-semibold mb-3">Sparziele</h2>
           <div className="space-y-4">
             {zielFortschritte.map(({ ziel, fortschritt }) => (
@@ -302,7 +302,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
       )}
 
       {/* Fixkosten */}
-      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm flex items-center justify-between">
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Fixkosten / Monat</p>
           <p className="text-2xl font-bold tabular-nums">{formatEuro(fixkostenMonat, hidden)}</p>
@@ -313,7 +313,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
       </div>
 
       {/* Nächste Termine */}
-      <div className="bg-white dark:bg-[#2d1c16] rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold">Nächste 30 Tage</h2>
           <button onClick={onOpenPositionForm} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
@@ -337,7 +337,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
                     <p className="text-xs text-gray-400 truncate">{t.beschreibung}</p>
                   </div>
                   {days <= 7 && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${isUrgent ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-gray-100 dark:bg-[#3d2718] text-gray-500'}`}>
+                    <span className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${isUrgent ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500'}`}>
                       {days === 0 ? 'heute' : `${days}d`}
                     </span>
                   )}
