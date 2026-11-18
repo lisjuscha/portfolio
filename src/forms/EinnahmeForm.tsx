@@ -10,7 +10,7 @@ export const EINNAHME_FARBEN: Record<EinnahmeKategorie, string> = {
   'Bonus': '#30d158',
   'Dividende': '#007aff',
   'Zinsen': '#5ac8fa',
-  'Mieteinnahmen': '#ff9500',
+  'Mieteinnahmen': '#4A2E27',
   'Freelance': '#af52de',
   'Sonstiges': '#8e8e93',
 }

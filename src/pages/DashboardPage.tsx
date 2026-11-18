@@ -238,7 +238,7 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
               className="h-full rounded-full transition-all"
               style={{
                 width: `${freistellungMini.pct}%`,
-                backgroundColor: freistellungMini.pct >= 90 ? '#ff3b30' : freistellungMini.pct >= 70 ? '#ff9500' : '#34c759'
+                backgroundColor: freistellungMini.pct >= 90 ? '#4D0E12' : freistellungMini.pct >= 70 ? '#A5BCD6' : '#34c759'
               }}
             />
           </div>

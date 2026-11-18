@@ -175,7 +175,7 @@ export function MehrPage({
                         </button>
                       </div>
                     </div>
-                    <ProgressBar value={fp.aktuell} max={z.zielbetrag} color="#007aff" />
+                    <ProgressBar value={fp.aktuell} max={z.zielbetrag} color="#A5BCD6" />
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-gray-500">{hidden ? '••••' : formatEuro(fp.aktuell)}</span>
                       <span className="font-medium">{fp.prozent.toFixed(0)}%</span>
@@ -284,7 +284,7 @@ export function MehrPage({
                 <ProgressBar
                   value={tagesgeldWert}
                   max={notfallZiel}
-                  color={tagesgeldWert >= notfallZiel ? '#34c759' : '#ff9500'}
+                  color={tagesgeldWert >= notfallZiel ? '#34c759' : '#A5BCD6'}
                 />
                 <div className="text-xs text-gray-400 text-center">
                   {((tagesgeldWert / notfallZiel) * 100).toFixed(0)}% · {' '}
@@ -303,7 +303,7 @@ export function MehrPage({
                     onClick={() => setNotfallMonateAndSave(m)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                       notfallMonate === m
-                        ? 'bg-orange-500 text-white border-orange-500'
+                        ? 'bg-[#4D0E12] text-white border-[#4D0E12]'
                         : 'border-gray-200 dark:border-[#38383a] text-gray-600 dark:text-gray-400'
                     }`}
                   >
@@ -343,7 +343,7 @@ export function MehrPage({
             <ProgressBar
               value={jahresErtraege}
               max={freistellungLimit}
-              color={jahresErtraege >= freistellungLimit * 0.9 ? '#ff3b30' : jahresErtraege >= freistellungLimit * 0.7 ? '#ff9500' : '#34c759'}
+              color={jahresErtraege >= freistellungLimit * 0.9 ? '#4D0E12' : jahresErtraege >= freistellungLimit * 0.7 ? '#A5BCD6' : '#34c759'}
             />
             <div className="text-xs text-gray-400 text-center">
               {((jahresErtraege / freistellungLimit) * 100).toFixed(1)}% ausgeschöpft

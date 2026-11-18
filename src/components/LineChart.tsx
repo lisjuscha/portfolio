@@ -63,7 +63,7 @@ export function LineChart({ snapshots, height = 120, hidden = false }: Props) {
       <path
         d={pathD}
         fill="none"
-        stroke={isPositive ? '#2563eb' : '#ef4444'}
+        stroke={isPositive ? '#A5BCD6' : '#4D0E12'}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

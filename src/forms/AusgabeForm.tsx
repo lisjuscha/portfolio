@@ -9,7 +9,7 @@ export const AUSGABEN_KATEGORIEN: AusgabenKategorie[] = [
 export const AUSGABEN_FARBEN: Record<AusgabenKategorie, string> = {
   'Lebensmittel': '#34c759',
   'Shopping': '#007aff',
-  'Restaurant & Café': '#ff9500',
+  'Restaurant & Café': '#4A2E27',
   'Transport': '#af52de',
   'Freizeit': '#ff2d55',
   'Gesundheit': '#ff3b30',
