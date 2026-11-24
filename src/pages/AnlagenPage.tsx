@@ -169,9 +169,8 @@ export function AnlagenPage({ hidden, positionen, konten, sparplaene, sparziele,
     <div>
       <div
         className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between">
           <div className="flex gap-1 bg-gray-100 dark:bg-[#2c2c2e] rounded-xl p-1">
             {(['liste', 'rebalancing', 'ertraege'] as AnlagenView[]).map(v => (
               <button

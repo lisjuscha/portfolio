@@ -9,6 +9,11 @@
   --color-blue-50: #e8f0f7;
 }
 
+:root {
+  --safe-top: max(env(safe-area-inset-top), 50px);
+  --safe-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
 @layer base {
   :root {
     color-scheme: light dark;

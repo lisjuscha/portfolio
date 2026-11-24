@@ -150,9 +150,8 @@ export function DashboardPage({ hidden, onToggleHidden, onRefreshQuotes, positio
       {/* Sticky nav bar — solid background covers Dynamic Island zone */}
       <div
         className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">Portfolio</h1>
           <div className="flex items-center gap-2">
             <button onClick={() => void handleRefresh()} className="p-2 text-gray-500 dark:text-gray-400 rounded-xl" aria-label="Kurse aktualisieren">

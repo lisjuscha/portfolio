@@ -73,9 +73,8 @@ export function TerminePage({ positionen, vertraege, sparplaene, embedded }: Pro
       {!embedded && (
         <div
           className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">Termine</h1>
             <button onClick={exportAll} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium">
               <Download size={16} /> ICS
