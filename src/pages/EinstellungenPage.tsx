@@ -105,8 +105,9 @@ export function EinstellungenPage({ hidden, onToggleHidden, konten, saveKonto, r
       {!embedded && (
         <div
           className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <h1 className="text-xl font-bold">Einstellungen</h1>
+          <h1 className="text-xl font-bold pt-2">Einstellungen</h1>
         </div>
       )}
       <div className="px-4 pt-4 pb-8 space-y-5">

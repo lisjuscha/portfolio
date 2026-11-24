@@ -140,8 +140,9 @@ export function MehrPage({
       {/* Header */}
       <div
         className="sticky top-0 z-10 bg-gray-50 dark:bg-black px-4 pb-3 border-b border-gray-200 dark:border-[#38383a]"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <h1 className="text-xl font-bold">Mehr</h1>
+        <h1 className="text-xl font-bold pt-2">Mehr</h1>
       </div>
 
       <div className="px-4 pt-4 pb-8 space-y-6">
